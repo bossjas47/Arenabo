@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>บัญชีของฉัน — TACTICAL STORE</title>
+  
+  <!-- Google Fonts: Outfit & Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['Outfit', 'Prompt', 'sans-serif'],
+            body: ['Prompt', 'sans-serif']
+          },
+          colors: {
+            tactical: {
+              black: '#050505',
+              card: '#0c0c0e',
+              amber: '#f59e0b',
+              amberHover: '#d97706',
+              border: 'rgba(255, 255, 255, 0.08)',
+              glow: 'rgba(245, 158, 11, 0.15)'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="selection:bg-amber-500/30 selection:text-white min-h-screen bg-[#050505] tactical-grid-bg text-zinc-300 pb-20">
+
+  <!-- Toast Notification Wrapper -->
+  <div id="toast-box" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 -translate-y-4 scale-95 flex items-center gap-3 bg-zinc-900 border border-amber-500/50 text-white px-5 py-3 rounded-2xl shadow-2xl backdrop-blur-xl">
+    <svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+    </svg>
+    <span id="toast-text" class="text-xs md:text-sm font-medium">ข้อความแจ้งเตือน</span>
+  </div>
+
+  <!-- Header Nav -->
+  <header class="sticky top-0 z-40 border-b border-white/5 bg-[#050505]/90 backdrop-blur-2xl">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex justify-between items-center">
+      
+      <!-- Logo -->
+      <a href="../index.html" class="flex items-center gap-3 group">
+        <div class="w-9 h-9 bg-amber-500 text-black flex items-center justify-center rounded-xl font-black text-xl shadow-[0_0_15px_rgba(245,158,11,0.4)] group-hover:scale-105 transition-transform">
+          <svg class="w-5 h-5 group-hover:rotate-90 transition-transform duration-500 stroke-black fill-none" stroke-width="2.5" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xl font-heading font-black text-white tracking-wider uppercase leading-none">
+            TACTICAL<span class="text-amber-500">STORE</span>
+          </span>
+          <span class="text-[10px] text-zinc-500 tracking-widest uppercase">หมวดหมู่บัญชีผู้ใช้งาน</span>
+        </div>
+      </a>
+
+      <!-- Action Area -->
+      <div class="flex items-center gap-3">
+        <a href="../index.html" class="flex items-center gap-2 text-xs font-bold text-zinc-400 hover:text-white bg-zinc-900/80 hover:bg-zinc-800 border border-white/10 px-4 py-2 rounded-full transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+          </svg>
+          <span>กลับหน้าร้านค้า</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+
+    <!-- GUEST / NOT LOGGED IN STATE -->
+    <div id="account-guest-view" class="hidden text-center py-20 max-w-md mx-auto glass-card p-8 rounded-3xl border border-white/10 shadow-2xl">
+      <div class="w-16 h-16 bg-zinc-900 border border-white/10 rounded-2xl flex items-center justify-center mx-auto mb-5 text-amber-500">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg>
+      </div>
+      <h2 class="text-2xl font-heading font-black text-white uppercase tracking-tight mb-2">
+        เข้าสู่ระบบบัญชีของคุณ
+      </h2>
+      <p class="text-zinc-400 text-xs mb-6 leading-relaxed">
+        กรุณาเข้าสู่ระบบเพื่อตรวจสอบประวัติคำสั่งซื้อ รหัสไอดีเกมที่ส่งมอบ หรือเข้าถึงสิทธิ์ผู้ดูแลระบบ
+      </p>
+      <div class="flex flex-col gap-3">
+        <a href="login.html?mode=login" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3 rounded-xl transition-all shadow-md text-xs uppercase tracking-wider text-center font-heading">
+          เข้าสู่ระบบ (LOGIN)
+        </a>
+        <a href="login.html?mode=register" class="w-full bg-zinc-900 hover:bg-zinc-800 text-white border border-white/10 font-bold py-3 rounded-xl transition-all text-xs uppercase tracking-wider text-center">
+          สมัครสมาชิกใหม่ (REGISTER)
+        </a>
+      </div>
+    </div>
+
+    <!-- LOGGED IN ACCOUNT DASHBOARD -->
+    <div id="account-dashboard-view" class="block space-y-8">
+      
+      <!-- Top Profile Hero Card -->
+      <div class="glass-card p-6 sm:p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div class="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 blur-[100px] rounded-full pointer-events-none"></div>
+
+        <div class="flex items-center gap-5 relative z-10">
+          <!-- Avatar Initial Circle -->
+          <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 text-black font-heading font-black text-2xl sm:text-3xl flex items-center justify-center shadow-[0_0_25px_rgba(245,158,11,0.3)] shrink-0">
+            <span id="account-avatar-initial">A</span>
+          </div>
+
+          <!-- User Identifiers -->
+          <div class="flex flex-col">
+            <div class="flex items-center gap-2.5 flex-wrap mb-1">
+              <h1 id="account-display-name" class="text-2xl sm:text-3xl font-heading font-black text-white tracking-tight">
+                Agent
+              </h1>
+              
+              <!-- Role Badge -->
+              <span id="account-role-badge" class="px-3 py-1 rounded-full text-xs font-mono font-bold">
+                สมาชิกทั่วไป (USER)
+              </span>
+            </div>
+
+            <span id="account-user-id" class="text-xs text-zinc-500 font-mono">
+              USERNAME: -
+            </span>
+            <span class="text-[11px] text-zinc-500 mt-1">
+              สถานะ: เข้าสู่ระบบเรียบร้อย • บัญชีปลอดภัย
+            </span>
+          </div>
+        </div>
+
+        <!-- Logout Action -->
+        <div class="relative z-10 flex items-center gap-3 w-full md:w-auto">
+          <button onclick="handleAccountSignOut()" class="w-full md:w-auto flex items-center justify-center gap-2 text-xs font-bold text-red-400 hover:text-white bg-red-500/10 hover:bg-red-500 border border-red-500/20 px-5 py-3 rounded-2xl transition-all active:scale-95">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            <span>ออกจากระบบ</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Account Navigation Tabs -->
+      <div class="border-b border-white/10 pb-3 flex gap-2 overflow-x-auto">
+        
+        <!-- Tab 1: Orders -->
+        <button id="tab-btn-orders" onclick="switchAccountTab('orders')" class="px-5 py-2.5 rounded-2xl text-xs font-bold transition-all bg-amber-500 text-black shadow-md flex items-center gap-2 shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+          <span>ประวัติคำสั่งซื้อของฉัน</span>
+          <span id="account-orders-count-badge" class="bg-black/80 text-amber-400 text-[10px] px-1.5 py-0.5 rounded-full font-mono font-bold">0</span>
+        </button>
+
+        <!-- Tab 2: Security -->
+        <button id="tab-btn-security" onclick="switchAccountTab('security')" class="px-5 py-2.5 rounded-2xl text-xs font-bold transition-all text-zinc-400 hover:text-white hover:bg-zinc-900 flex items-center gap-2 shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          <span>ความปลอดภัย &amp; รหัสผ่าน</span>
+        </button>
+
+        <!-- Tab 3: Backoffice (STRICTLY HIDDEN FOR REGULAR USERS, ONLY SHOWN FOR ADMIN atest) -->
+        <button id="tab-btn-admin" onclick="switchAccountTab('admin')" class="hidden px-5 py-2.5 rounded-2xl text-xs font-bold transition-all bg-gradient-to-r from-amber-500/20 to-amber-600/20 text-amber-400 border border-amber-500/30 hover:bg-amber-500 hover:text-black flex items-center gap-2 shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          <span>ระบบจัดการหลังบ้าน (ADMIN)</span>
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+        </button>
+
+      </div>
+
+      <!-- TAB 1 CONTENT: ORDER HISTORY -->
+      <section id="account-sec-orders" class="block space-y-6">
+        <div>
+          <h2 class="text-xl font-heading font-black text-white uppercase tracking-tight">
+            รายการคำสั่งซื้อของคุณ
+          </h2>
+          <p class="text-zinc-500 text-xs mt-1">
+            ไอดีและรหัสผ่านที่คุณเคยสั่งซื้อทั้งหมดจะถูกจัดเก็บไว้อย่างปลอดภัย สามารถคลิกเพื่อดูรหัสผ่านและคัดลอกได้ตลอดเวลา
+          </p>
+        </div>
+
+        <div id="account-orders-list" class="space-y-4">
+          <!-- Rendered via JS -->
+        </div>
+
+        <div id="account-orders-empty" class="hidden py-16 text-center flex-col items-center justify-center border border-dashed border-white/10 rounded-3xl bg-zinc-950">
+          <div class="text-4xl mb-3">📦</div>
+          <h3 class="text-base font-bold text-white mb-1">ยังไม่มีประวัติคำสั่งซื้อ</h3>
+          <p class="text-zinc-500 text-xs mb-5">เมื่อคุณเลือกซื้อไอดีเกม รหัสบัญชีจะมาปรากฏในหน้านี้ทันที</p>
+          <a href="../index.html#catalog-section" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-6 py-2.5 rounded-full text-xs font-heading">
+            เลือกซื้อไอดีเกมเลย
+          </a>
+        </div>
+      </section>
+
+      <!-- TAB 2 CONTENT: SECURITY SETTINGS -->
+      <section id="account-sec-security" class="hidden space-y-6">
+        <div>
+          <h2 class="text-xl font-heading font-black text-white uppercase tracking-tight">
+            ความปลอดภัย &amp; สิทธิ์การใช้งาน
+          </h2>
+          <p class="text-zinc-500 text-xs mt-1">
+            จัดการรหัสผ่านและสิทธิ์ความปลอดภัยของบัญชี
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="glass-card p-6 rounded-3xl border border-white/10 space-y-4">
+            <h3 class="font-bold text-white text-sm flex items-center gap-2">
+              <span>🛡️</span> สถานะการรักษาความปลอดภัย
+            </h3>
+            <ul class="text-xs text-zinc-400 space-y-2.5">
+              <li class="flex items-center gap-2">
+                <span class="text-emerald-400">✓</span> บัญชีเปิดใช้งานสิทธิ์การเข้ารหัสผ่าน Firebase
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="text-emerald-400">✓</span> สิทธิ์การเข้าถึงข้อมูลถูกจำกัดตามบทบาท (RBAC)
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="text-amber-400">•</span> คำแนะนำ: เปลี่ยนรหัสผ่านทุก ๆ 90 วันเพื่อความปลอดภัย
+              </li>
+            </ul>
+          </div>
+
+          <div class="glass-card p-6 rounded-3xl border border-white/10 space-y-4">
+            <h3 class="font-bold text-white text-sm flex items-center gap-2">
+              <span>🔑</span> เปลี่ยนรหัสผ่านเข้าใช้งาน
+            </h3>
+            <form onsubmit="handlePasswordChange(event)" class="space-y-3">
+              <div>
+                <input 
+                  id="change-pw-new" 
+                  type="password" 
+                  placeholder="รหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร)..." 
+                  class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                  required
+                />
+              </div>
+              <div>
+                <input 
+                  id="change-pw-confirm" 
+                  type="password" 
+                  placeholder="ยืนยันรหัสผ่านใหม่อีกครั้ง..." 
+                  class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                  required
+                />
+              </div>
+              <button type="submit" class="w-full bg-zinc-800 hover:bg-amber-500 hover:text-black font-bold py-2.5 rounded-xl text-xs transition-all">
+                อัปเดตรหัสผ่าน
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3 CONTENT: BACKOFFICE MANAGEMENT (STRICTLY FOR ADMIN atest) -->
+      <section id="account-sec-admin" class="hidden space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="inline-flex items-center gap-2 text-amber-500 text-[10px] font-mono uppercase tracking-widest mb-1 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span>
+              ADMIN PORTAL • SENSITIVE BACKOFFICE
+            </div>
+            <h2 class="text-2xl font-heading font-black text-white uppercase tracking-tight">
+              ระบบจัดการหลังบ้าน (ย้ายมาอยู่ในหมวดหมู่บัญชี)
+            </h2>
+            <p class="text-zinc-500 text-xs mt-1">
+              ส่วนควบคุมพิเศษสำหรับแอดมิน <strong class="text-amber-400">atest</strong> เท่านั้น บุคคลทั่วไปและผู้ใช้ธรรมดาจะไม่เห็นหน้านี้
+            </p>
+          </div>
+
+          <a href="admin.html" class="hidden sm:flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black font-bold px-5 py-3 rounded-2xl transition-all shadow-lg text-xs font-heading">
+            <span>เปิดหน้าแอดมินเต็มจอ</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </a>
+        </div>
+
+        <!-- Admin Quick Actions Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <div class="glass-card p-6 rounded-3xl border border-white/10 hover:border-amber-500/40 transition-all group">
+            <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 mb-4 group-hover:scale-105 transition-transform text-xl">
+              📦
+            </div>
+            <h3 class="font-bold text-white text-sm mb-1">จัดการสินค้า &amp; คลังรูป</h3>
+            <p class="text-zinc-500 text-xs leading-relaxed mb-4">เพิ่มสินค้าใหม่ ใส่ URL รูปหลัก และแกลเลอรี่ภาพของในตัวไอดี</p>
+            <a href="admin.html" class="text-xs font-bold text-amber-400 hover:text-white flex items-center gap-1">
+              ไปยังหน้าจัดการสินค้า →
+            </a>
+          </div>
+
+          <div class="glass-card p-6 rounded-3xl border border-white/10 hover:border-amber-500/40 transition-all group">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-4 group-hover:scale-105 transition-transform text-xl">
+              📋
+            </div>
+            <h3 class="font-bold text-white text-sm mb-1">คำสั่งซื้อลูกค้าทั้งหมด</h3>
+            <p class="text-zinc-500 text-xs leading-relaxed mb-4">ตรวจสอบออเดอร์ ยอดเงินเข้า สลิป และบัญชีไอดีที่ระบบนำส่ง</p>
+            <a href="admin.html" class="text-xs font-bold text-emerald-400 hover:text-white flex items-center gap-1">
+              ไปยังตารางคำสั่งซื้อ →
+            </a>
+          </div>
+
+          <div class="glass-card p-6 rounded-3xl border border-white/10 hover:border-amber-500/40 transition-all group">
+            <div class="w-12 h-12 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 mb-4 group-hover:scale-105 transition-transform text-xl">
+              🏷️
+            </div>
+            <h3 class="font-bold text-white text-sm mb-1">โค้ดส่วนลด (Promos)</h3>
+            <p class="text-zinc-500 text-xs leading-relaxed mb-4">สร้างและลบโค้ดโปรโมชั่น ลดเป็นบาทหรือลดเป็นเปอร์เซ็นต์</p>
+            <a href="admin.html" class="text-xs font-bold text-orange-400 hover:text-white flex items-center gap-1">
+              จัดการโค้ดส่วนลด →
+            </a>
+          </div>
+
+          <div class="glass-card p-6 rounded-3xl border border-white/10 hover:border-amber-500/40 transition-all group">
+            <div class="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-4 group-hover:scale-105 transition-transform text-xl">
+              ⚙️
+            </div>
+            <h3 class="font-bold text-white text-sm mb-1">ตั้งค่าร้านค้า &amp; ประกาศ</h3>
+            <p class="text-zinc-500 text-xs leading-relaxed mb-4">แก้ไขข้อความตัววิ่ง Marquee ด้านบน และลิงก์ Discord ของร้าน</p>
+            <a href="admin.html" class="text-xs font-bold text-blue-400 hover:text-white flex items-center gap-1">
+              ตั้งค่าร้านค้า →
+            </a>
+          </div>
+
+        </div>
+
+        <!-- Big Launch Console Banner -->
+        <div class="bg-gradient-to-r from-zinc-950 via-zinc-900 to-black border border-amber-500/30 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl">
+          <div>
+            <h3 class="text-lg font-heading font-black text-white uppercase mb-1">
+              เข้าสู่แดชบอร์ดหลังบ้านเต็มรูปแบบ (FULL ADMIN CONSOLE)
+            </h3>
+            <p class="text-zinc-400 text-xs">
+              มีตารางสินค้า ตารางคำสั่งซื้อ ฟอร์มปรับแต่งรูปภาพ Preset สถิติยอดขายรวม และระบบรีเซ็ตสินค้า 6 รายการ
+            </p>
+          </div>
+          <a href="admin.html" class="bg-amber-500 hover:bg-white text-black font-bold px-8 py-3.5 rounded-2xl text-xs uppercase tracking-wider transition-all font-heading shrink-0 shadow-lg active:scale-95">
+            เปิดแดชบอร์ดหลังบ้าน
+          </a>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <script type="module" src="../js/account.js"></script>
+</body>
+</html>

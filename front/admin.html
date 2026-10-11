@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบหลังบ้านผู้ดูแล — TACTICAL STORE</title>
+  
+  <!-- Google Fonts: Outfit & Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['Outfit', 'Prompt', 'sans-serif'],
+            body: ['Prompt', 'sans-serif']
+          },
+          colors: {
+            tactical: {
+              black: '#050505',
+              card: '#0c0c0e',
+              amber: '#f59e0b',
+              amberHover: '#d97706',
+              border: 'rgba(255, 255, 255, 0.08)',
+              glow: 'rgba(245, 158, 11, 0.15)'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="selection:bg-amber-500/30 selection:text-white min-h-screen bg-[#050505] tactical-grid-bg text-zinc-300 pb-20">
+
+  <!-- Toast Notification Wrapper -->
+  <div id="toast-box" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 -translate-y-4 scale-95 flex items-center gap-3 bg-zinc-900 border border-amber-500/50 text-white px-5 py-3 rounded-2xl shadow-2xl backdrop-blur-xl">
+    <svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+    </svg>
+    <span id="toast-text" class="text-xs md:text-sm font-medium">ข้อความแจ้งเตือน</span>
+  </div>
+
+  <!-- SECURITY GATE MODAL (ADMIN UNLOCK) -->
+  <div id="admin-auth-gate" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl">
+    <div class="glass-card max-w-md w-full p-8 rounded-3xl border border-amber-500/30 shadow-2xl text-center relative overflow-hidden">
+      <div class="w-16 h-16 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center mx-auto mb-5 text-amber-500">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+        </svg>
+      </div>
+
+      <div class="inline-flex items-center gap-2 text-amber-500 text-[10px] font-mono uppercase tracking-widest mb-2 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+        RESTRICTED BACKOFFICE ACCESS
+      </div>
+
+      <h2 class="text-2xl font-heading font-black text-white uppercase tracking-tight mb-2">
+        เข้าสู่ระบบผู้ดูแลร้านค้า
+      </h2>
+      <p class="text-zinc-400 text-xs mb-6">
+        กรุณากรอกรหัสผ่าน Admin Passkey หรือลงชื่อเข้าใช้ด้วยบัญชีแอดมิน (รหัสผ่านเริ่มต้น: <span class="font-mono text-amber-400 font-bold">tactical2026</span>)
+      </p>
+
+      <form onsubmit="handleAdminUnlock(event)" class="space-y-4">
+        <div>
+          <input 
+            id="admin-passkey-input" 
+            type="password" 
+            placeholder="กรอก Admin Passkey..." 
+            class="w-full bg-zinc-900 border border-white/10 rounded-2xl px-4 py-3.5 text-center text-sm text-white tracking-widest focus:outline-none focus:border-amber-500 font-mono"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+
+        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3.5 rounded-2xl transition-all shadow-lg text-xs uppercase tracking-wider active:scale-95">
+          ปลดล็อกเข้าสู่แดชบอร์ด (UNLOCK)
+        </button>
+      </form>
+
+      <div class="mt-6 pt-6 border-t border-white/5 flex items-center justify-between text-xs text-zinc-500">
+        <a href="../index.html" class="hover:text-white transition-colors">← กลับสู่หน้าร้านค้า</a>
+        <span class="font-mono text-[10px]">AUTH v2.8</span>
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- ACCESS DENIED SCREEN FOR REGULAR USERS -->
+  <div id="admin-access-denied" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/95 backdrop-blur-xl">
+    <div class="glass-card max-w-md w-full p-8 rounded-3xl border border-red-500/40 shadow-2xl text-center relative overflow-hidden">
+      <div class="w-16 h-16 bg-red-500/10 border border-red-500/30 rounded-2xl flex items-center justify-center mx-auto mb-5 text-red-500 text-3xl">
+        ⛔
+      </div>
+      <div class="inline-flex items-center gap-2 text-red-400 text-[10px] font-mono uppercase tracking-widest mb-2 bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20">
+        403 ACCESS FORBIDDEN
+      </div>
+      <h2 class="text-2xl font-heading font-black text-white uppercase tracking-tight mb-2">
+        คุณไม่มีสิทธิ์เข้าถึงส่วนหลังบ้าน
+      </h2>
+      <p class="text-zinc-400 text-xs mb-6 leading-relaxed">
+        ระบบสงวนสิทธิ์เฉพาะผู้ดูแลระบบ (<span class="font-bold text-amber-400">atest</span>) เท่านั้น บัญชีของคุณคือผู้ใช้ทั่วไป ระบบกำลังพาท่านกลับสู่หน้าบัญชี...
+      </p>
+      <a href="account.html" class="w-full inline-block bg-zinc-900 hover:bg-zinc-800 text-white font-bold py-3 rounded-xl transition-all text-xs uppercase tracking-wider font-heading border border-white/10">
+        กลับสู่หน้าบัญชีผู้ใช้
+      </a>
+    </div>
+  </div>
+
+  <!-- MAIN ADMIN DASHBOARD (Visible when unlocked) -->
+  <div id="admin-main-content" class="hidden">
+    
+    <!-- Top Admin Header -->
+    <header class="sticky top-0 z-40 border-b border-white/10 bg-[#050505]/95 backdrop-blur-2xl">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex justify-between items-center">
+        
+        <div class="flex items-center gap-3">
+          <a href="../index.html" class="flex items-center gap-2 group">
+            <div class="w-8 h-8 bg-amber-500 text-black flex items-center justify-center rounded-lg font-black text-lg">
+              <svg class="w-4 h-4 stroke-black fill-none" stroke-width="2.5" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
+              </svg>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-lg font-heading font-black text-white tracking-wider uppercase leading-none">
+                TACTICAL<span class="text-amber-500">STORE</span>
+              </span>
+              <span class="text-[9px] text-amber-500/80 font-mono uppercase tracking-widest font-bold">ADMIN BACKOFFICE</span>
+            </div>
+          </a>
+
+          <!-- Live Firebase Tag -->
+          <div class="hidden sm:flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full text-[11px] font-bold text-emerald-400 ml-4">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Firestore: psl-esport (LIVE)</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <a href="account.html" class="flex items-center gap-1.5 text-xs font-bold text-zinc-400 hover:text-white bg-zinc-900 border border-white/10 px-3.5 py-2 rounded-full transition-all hover:border-amber-500/30">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            <span>กลับหน้าบัญชี</span>
+          </a>
+
+          <button onclick="lockAdminSession()" class="flex items-center gap-1.5 text-xs font-bold text-red-400 hover:text-red-300 bg-red-500/10 border border-red-500/20 px-3.5 py-2 rounded-full transition-all">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+            <span>ล็อกหน้าจอ</span>
+          </button>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Admin Sub-Navigation Tabs -->
+    <div class="border-b border-white/5 bg-[#080808]">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 flex gap-2 overflow-x-auto py-2.5">
+        <button id="admin-tab-btn-products" onclick="switchAdminTab('products')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-amber-500 text-black shadow-md flex items-center gap-1.5 shrink-0">
+          <span>📦</span> จัดการสินค้า
+        </button>
+        <button id="admin-tab-btn-categories" onclick="switchAdminTab('categories')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-zinc-400 hover:text-white hover:bg-zinc-900 flex items-center gap-1.5 shrink-0">
+          <span>🗂️</span> หมวดหมู่
+        </button>
+        <button id="admin-tab-btn-vault" onclick="switchAdminTab('vault')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-zinc-400 hover:text-white hover:bg-zinc-900 flex items-center gap-1.5 shrink-0">
+          <span>🔐</span> คลังไอดี (Vault)
+        </button>
+        <button id="admin-tab-btn-submissions" onclick="switchAdminTab('submissions')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-zinc-400 hover:text-white hover:bg-zinc-900 flex items-center gap-1.5 shrink-0">
+          <span>📥</span> ส่งขายไอดี
+        </button>
+        <button id="admin-tab-btn-orders" onclick="switchAdminTab('orders')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-zinc-400 hover:text-white hover:bg-zinc-900 flex items-center gap-1.5 shrink-0">
+          <span>📋</span> คำสั่งซื้อ (Orders)
+        </button>
+        <button id="admin-tab-btn-promos" onclick="switchAdminTab('promos')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-zinc-400 hover:text-white hover:bg-zinc-900 flex items-center gap-1.5 shrink-0">
+          <span>🏷️</span> โค้ดส่วนลด
+        </button>
+        <button id="admin-tab-btn-users" onclick="switchAdminTab('users')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-zinc-400 hover:text-white hover:bg-zinc-900 flex items-center gap-1.5 shrink-0">
+          <span>👥</span> ผู้ใช้งาน &amp; สิทธิ์
+        </button>
+        <button id="admin-tab-btn-reviews" onclick="switchAdminTab('reviews')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-zinc-400 hover:text-white hover:bg-zinc-900 flex items-center gap-1.5 shrink-0">
+          <span>⭐</span> รีวิวร้านค้า
+        </button>
+        <button id="admin-tab-btn-settings" onclick="switchAdminTab('settings')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-zinc-400 hover:text-white hover:bg-zinc-900 flex items-center gap-1.5 shrink-0">
+          <span>⚙️</span> ตั้งค่าร้านค้า
+        </button>
+      </div>
+    </div>
+
+    <!-- Admin Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+
+      <!-- SECTION 1: PRODUCT MANAGEMENT & IMAGE CUSTOMIZATION -->
+      <section id="admin-sec-products" class="block space-y-6">
+        
+        <!-- Header Actions & Metrics -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="glass-card p-5 rounded-2xl border border-white/5">
+            <span class="text-xs text-zinc-500 font-bold block mb-1">สินค้าทั้งหมด</span>
+            <span id="metric-total-products" class="text-3xl font-heading font-black text-white">0</span>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border border-white/5">
+            <span class="text-xs text-zinc-500 font-bold block mb-1">พร้อมส่ง (In-Stock)</span>
+            <span id="metric-instock-products" class="text-3xl font-heading font-black text-emerald-400">0</span>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border border-white/5">
+            <span class="text-xs text-zinc-500 font-bold block mb-1">สินค้าหมด (Out of Stock)</span>
+            <span id="metric-outofstock-products" class="text-3xl font-heading font-black text-red-400">0</span>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border border-white/5 flex flex-col justify-center gap-2">
+            <button onclick="openProductModal()" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              เพิ่มสินค้าใหม่
+            </button>
+            <button onclick="seedInitialProducts()" class="w-full bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/10 font-bold py-1.5 px-3 rounded-xl text-[11px] flex items-center justify-center gap-1 transition-all">
+              <span>⚡</span> คืนค่า 6 สินค้าเริ่มต้น
+            </button>
+          </div>
+        </div>
+
+        <!-- Search & Filter Bar -->
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-zinc-950 p-4 rounded-2xl border border-white/5">
+          <div class="relative w-full sm:w-80">
+            <input 
+              id="admin-product-search" 
+              type="text" 
+              placeholder="ค้นหาชื่อสินค้า หมวดหมู่ หรือแท็ก..." 
+              oninput="filterAdminProducts(this.value)"
+              class="w-full bg-zinc-900 border border-white/10 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+            />
+            <svg class="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+
+          <div class="text-xs text-zinc-400">
+            💡 ข้อมูลจะถูกซิงค์ขึ้น <strong class="text-amber-400">Firestore (Collection: products)</strong> ทันทีเมื่อเพิ่มหรือแก้ไข
+          </div>
+        </div>
+
+        <!-- Products Table -->
+        <div class="glass-card rounded-3xl border border-white/10 overflow-hidden shadow-xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs admin-table">
+              <thead class="bg-zinc-900/90 text-zinc-400 uppercase tracking-wider font-mono border-b border-white/5">
+                <tr>
+                  <th class="py-3.5 px-4 w-20">รูปภาพ</th>
+                  <th class="py-3.5 px-4">ชื่อสินค้า / รายละเอียด</th>
+                  <th class="py-3.5 px-4">หมวดหมู่</th>
+                  <th class="py-3.5 px-4">ราคา (฿)</th>
+                  <th class="py-3.5 px-4">มูลค่า Koen</th>
+                  <th class="py-3.5 px-4">สต็อกคงเหลือ</th>
+                  <th class="py-3.5 px-4 text-right">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="admin-products-table-body" class="divide-y divide-white/5 text-zinc-300">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+          
+          <div id="admin-products-empty" class="hidden py-16 text-center text-zinc-500 text-xs">
+            ไม่พบสินค้าในระบบ กรุณากด "เพิ่มสินค้าใหม่" หรือ "คืนค่า 6 สินค้าเริ่มต้น"
+          </div>
+        </div>
+
+      </section>
+
+      <!-- SECTION 2: ORDER MANAGEMENT -->
+      <section id="admin-sec-orders" class="hidden space-y-6">
+        
+        <!-- Order Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="glass-card p-5 rounded-2xl border border-white/5">
+            <span class="text-xs text-zinc-500 font-bold block mb-1">ยอดขายรวมทั้งหมด</span>
+            <span id="metric-order-revenue" class="text-3xl font-heading font-black text-amber-500">฿0.00</span>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border border-white/5">
+            <span class="text-xs text-zinc-500 font-bold block mb-1">คำสั่งซื้อสำเร็จ</span>
+            <span id="metric-order-count" class="text-3xl font-heading font-black text-white">0</span>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border border-white/5">
+            <span class="text-xs text-zinc-500 font-bold block mb-1">ชำระผ่าน PromptPay</span>
+            <span id="metric-order-promptpay" class="text-3xl font-heading font-black text-emerald-400">0</span>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border border-white/5">
+            <span class="text-xs text-zinc-500 font-bold block mb-1">ชำระผ่าน TrueMoney</span>
+            <span id="metric-order-truemoney" class="text-3xl font-heading font-black text-orange-400">0</span>
+          </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="glass-card rounded-3xl border border-white/10 overflow-hidden shadow-xl">
+          <div class="p-5 border-b border-white/5 flex justify-between items-center">
+            <h3 class="font-heading font-bold text-white text-base">รายการคำสั่งซื้อจากลูกค้า (Collection: orders)</h3>
+            <button onclick="refreshOrders()" class="text-xs font-bold text-amber-500 hover:underline flex items-center gap-1">
+              <span>↻</span> รีเฟรชข้อมูล
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs admin-table">
+              <thead class="bg-zinc-900/90 text-zinc-400 uppercase tracking-wider font-mono border-b border-white/5">
+                <tr>
+                  <th class="py-3.5 px-4">เลขที่ออเดอร์</th>
+                  <th class="py-3.5 px-4">เวลาสั่งซื้อ</th>
+                  <th class="py-3.5 px-4">สินค้า</th>
+                  <th class="py-3.5 px-4">ยอดเงิน</th>
+                  <th class="py-3.5 px-4">ช่องทาง</th>
+                  <th class="py-3.5 px-4">ไอดีที่ส่งมอบ (User / Pass)</th>
+                  <th class="py-3.5 px-4">สถานะ</th>
+                </tr>
+              </thead>
+              <tbody id="admin-orders-table-body" class="divide-y divide-white/5 text-zinc-300">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <div id="admin-orders-empty" class="hidden py-16 text-center text-zinc-500 text-xs">
+            ยังไม่มีรายการคำสั่งซื้อในระบบ
+          </div>
+        </div>
+
+      </section>
+
+      <!-- SECTION 3: PROMO CODE MANAGEMENT -->
+      <section id="admin-sec-promos" class="hidden space-y-6">
+        
+        <div class="grid lg:grid-cols-12 gap-8 items-start">
+          
+          <!-- Add Promo Form -->
+          <div class="lg:col-span-5 glass-card p-6 md:p-8 rounded-3xl border border-white/10 shadow-xl">
+            <h3 class="font-heading font-black text-white text-lg uppercase mb-2">สร้างโค้ดส่วนลดใหม่</h3>
+            <p class="text-zinc-500 text-xs mb-6">โค้ดจะถูกนำไปตรวจสอบตอนลูกค้าชำระเงินที่หน้าแรก</p>
+
+            <form onsubmit="handleCreatePromo(event)" class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-zinc-400 mb-1.5">รหัสโค้ด (เช่น TACTICAL, SPECIAL50):</label>
+                <input 
+                  id="promo-code-name" 
+                  type="text" 
+                  placeholder="ใส่รหัสโค้ด (พิมพ์ใหญ่)..." 
+                  class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white uppercase focus:outline-none focus:border-amber-500 font-mono"
+                  required
+                />
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-zinc-400 mb-1.5">ประเภทส่วนลด:</label>
+                  <select id="promo-discount-type" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+                    <option value="fixed">บาท (THB)</option>
+                    <option value="percent">เปอร์เซ็นต์ (%)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-zinc-400 mb-1.5">มูลค่าที่ลด:</label>
+                  <input 
+                    id="promo-discount-val" 
+                    type="number" 
+                    min="1" 
+                    placeholder="เช่น 50 หรือ 10" 
+                    class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-zinc-400 mb-1.5">คำอธิบายโค้ด:</label>
+                <input 
+                  id="promo-desc" 
+                  type="text" 
+                  placeholder="เช่น ลด 50 บาทสำหรับไอดีทุกประเภท" 
+                  class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                />
+              </div>
+
+              <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3 rounded-xl transition-all shadow-md text-xs font-heading">
+                บันทึกโค้ดส่วนลด
+              </button>
+            </form>
+          </div>
+
+          <!-- Promo List Table -->
+          <div class="lg:col-span-7 glass-card rounded-3xl border border-white/10 overflow-hidden shadow-xl p-6">
+            <h3 class="font-heading font-bold text-white text-base mb-4">โค้ดส่วนลดที่มีในระบบ</h3>
+            
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs admin-table">
+                <thead class="bg-zinc-900 text-zinc-400 uppercase font-mono border-b border-white/5">
+                  <tr>
+                    <th class="py-3 px-3">โค้ด</th>
+                    <th class="py-3 px-3">ส่วนลด</th>
+                    <th class="py-3 px-3">คำอธิบาย</th>
+                    <th class="py-3 px-3 text-right">ลบ</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-promos-table-body" class="divide-y divide-white/5">
+                  <!-- Rendered via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- SECTION 4: STORE SETTINGS & ANNOUNCEMENTS -->
+      <section id="admin-sec-settings" class="hidden space-y-6">
+        
+        <div class="max-w-3xl mx-auto glass-card p-6 md:p-10 rounded-3xl border border-white/10 shadow-xl">
+          <h3 class="font-heading font-black text-white text-xl uppercase mb-1">ตั้งค่าร้านค้า &amp; ข้อความประกาศ</h3>
+          <p class="text-zinc-500 text-xs mb-8">บันทึกการตั้งค่าลง Firestore เพื่อให้หน้าเว็บเปลี่ยนทันทีแบบเรียลไทม์</p>
+
+          <form onsubmit="handleSaveSettings(event)" class="space-y-6">
+            <div>
+              <label class="block text-xs font-bold text-zinc-400 mb-2">
+                📢 ข้อความตัววิ่งด้านบนสุด (Marquee Announcement):
+              </label>
+              <textarea 
+                id="setting-marquee-text" 
+                rows="3" 
+                class="w-full bg-zinc-900 border border-white/10 rounded-2xl p-4 text-xs text-white focus:outline-none focus:border-amber-500 leading-relaxed font-mono"
+              ></textarea>
+              <span class="text-[11px] text-zinc-500 mt-1 block">ข้อความจะเลื่อนผ่านหน้าจอแบบไม่มีที่สิ้นสุดที่แถบสีส้มด้านบน</span>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-zinc-400 mb-2">
+                🔔 Discord Webhook URL (แจ้งเตือนออเดอร์ใหม่ &amp; รายการส่งขายไอดี):
+              </label>
+              <div class="flex gap-2">
+                <input 
+                  id="setting-discord-webhook" 
+                  type="url" 
+                  placeholder="https://discord.com/api/webhooks/..." 
+                  class="flex-grow bg-zinc-900 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+                />
+                <button type="button" onclick="testDiscordWebhook()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 font-bold px-4 py-3 rounded-xl text-xs shrink-0 transition-all border border-white/10 hover:border-amber-500/40">
+                  ⚡ ทดสอบ Webhook
+                </button>
+              </div>
+              <span class="text-[11px] text-zinc-500 mt-1 block">ระบบจะส่งข้อความแจ้งเตือนเข้าห้อง Discord ของแอดมินทันทีเมื่อมีรายการใหม่</span>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-zinc-400 mb-2">เบอร์พร้อมเพย์รับเงิน (PromptPay No.):</label>
+                <input 
+                  id="setting-promptpay-no" 
+                  type="text" 
+                  placeholder="089xxxxxxx หรือ เลขบัตร ปชช." 
+                  class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+                />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-zinc-400 mb-2">ชื่อบัญชีร้านค้า (Account Name):</label>
+                <input 
+                  id="setting-account-name" 
+                  type="text" 
+                  placeholder="MOSZXLL SHOP หรือ ชื่อ-นามสกุล" 
+                  class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-amber-500"
+                />
+              </div>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-zinc-400 mb-2">ลิงก์ Discord ชุมชน:</label>
+                <input 
+                  id="setting-discord-link" 
+                  type="url" 
+                  placeholder="https://discord.gg/..." 
+                  class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-amber-500"
+                />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-zinc-400 mb-2">Line ID / ช่องทางติดต่อ:</label>
+                <input 
+                  id="setting-line-id" 
+                  type="text" 
+                  placeholder="@tacticalstore" 
+                  class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-amber-500"
+                />
+              </div>
+            </div>
+
+            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3.5 rounded-2xl transition-all shadow-lg text-xs font-heading">
+              บันทึกการตั้งค่าร้านค้า (SAVE SETTINGS)
+            </button>
+          </form>
+        </div>
+
+      </section>
+
+    
+      <!-- SECTION: CATEGORIES -->
+      <section id="admin-sec-categories" class="hidden space-y-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="glass-card p-5 rounded-2xl border border-white/5">
+            <span class="text-xs text-zinc-500 font-bold block mb-1">หมวดหมู่ทั้งหมด</span>
+            <span id="metric-total-categories" class="text-3xl font-heading font-black text-white">0</span>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border border-white/5">
+            <span class="text-xs text-zinc-500 font-bold block mb-1">หมวดหมู่ที่มีสินค้า</span>
+            <span id="metric-active-categories" class="text-3xl font-heading font-black text-emerald-400">0</span>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border border-white/5">
+            <span class="text-xs text-zinc-500 font-bold block mb-1">สินค้ารวมทุกหมวด</span>
+            <span id="metric-cat-products" class="text-3xl font-heading font-black text-amber-400">0</span>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border border-white/5 flex flex-col justify-center gap-2">
+            <button onclick="openCategoryModal()" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all font-heading">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              เพิ่มหมวดหมู่ใหม่
+            </button>
+            <button onclick="seedDefaultCategories()" class="w-full bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/10 font-bold py-1.5 px-3 rounded-xl text-[11px] flex items-center justify-center gap-1 transition-all">
+              <span>⚡</span> คืนค่า 3 หมวดหมู่เริ่มต้น
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-3xl border border-white/10 overflow-hidden shadow-xl">
+          <div class="p-4 border-b border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 bg-zinc-950/60">
+            <div class="relative w-full sm:w-80">
+              <input 
+                id="admin-category-search" 
+                type="text" 
+                placeholder="ค้นหาชื่อหมวดหมู่ หรือรหัส ID..." 
+                oninput="filterAdminCategories(this.value)" 
+                class="w-full bg-zinc-900 border border-white/10 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+              />
+              <svg class="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+            </div>
+            <span class="text-xs text-zinc-400">💡 หมวดหมู่จะนำไปแสดงบนหน้าแรกและหน้าเลือกซื้อสินค้า</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs admin-table">
+              <thead class="bg-zinc-900/90 text-zinc-400 uppercase tracking-wider font-mono border-b border-white/5">
+                <tr>
+                  <th class="py-3 px-4">รูปภาพ</th>
+                  <th class="py-3 px-4">ชื่อหมวดหมู่</th>
+                  <th class="py-3 px-4">รหัสหมวดหมู่ (ID)</th>
+                  <th class="py-3 px-4 text-center">จำนวนสินค้า</th>
+                  <th class="py-3 px-4 text-right">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="admin-categories-table-body" class="divide-y divide-white/5 text-zinc-300">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+          <div id="admin-categories-empty" class="hidden p-12 text-center text-zinc-500 text-xs">
+            ไม่พบหมวดหมู่สินค้าในระบบ
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: INVENTORY VAULT (ตู้เซฟคลังสต็อกไอดีเกมจริง) -->
+      <section id="admin-sec-vault" class="hidden space-y-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="glass-card p-5 rounded-2xl border border-white/5">
+            <span class="text-xs text-zinc-500 font-bold block mb-1">ไอดีทั้งหมดในคลัง</span>
+            <span id="metric-vault-total" class="text-3xl font-heading font-black text-white">0</span>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border border-white/5">
+            <span class="text-xs text-zinc-500 font-bold block mb-1">พร้อมส่ง (Available)</span>
+            <span id="metric-vault-available" class="text-3xl font-heading font-black text-emerald-400">0</span>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border border-white/5">
+            <span class="text-xs text-zinc-500 font-bold block mb-1">ขายแล้ว (Sold Out)</span>
+            <span id="metric-vault-sold" class="text-3xl font-heading font-black text-zinc-400">0</span>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border border-white/5 flex flex-col justify-center gap-2">
+            <button onclick="openVaultSingleModal()" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all font-heading">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              เพิ่มไอดี 1 บัญชี
+            </button>
+            <button onclick="openVaultBulkModal()" class="w-full bg-zinc-900 hover:bg-zinc-800 text-amber-400 border border-amber-500/30 font-bold py-1.5 px-3 rounded-xl text-[11px] flex items-center justify-center gap-1 transition-all">
+              <span>📦</span> นำเข้าไอดีเป็นชุด (Bulk)
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-3xl border border-white/10 overflow-hidden shadow-xl">
+          <div class="p-4 border-b border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 bg-zinc-950/60">
+            <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+              <div class="relative w-full sm:w-64">
+                <input 
+                  id="admin-vault-search" 
+                  type="text" 
+                  placeholder="ค้นหา Username หรือรหัสออเดอร์..." 
+                  oninput="filterAdminVault()" 
+                  class="w-full bg-zinc-900 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                />
+                <svg class="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+              </div>
+              <select id="admin-vault-product-filter" onchange="filterAdminVault()" class="bg-zinc-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                <option value="all">ทุกสินค้า</option>
+              </select>
+              <select id="admin-vault-status-filter" onchange="filterAdminVault()" class="bg-zinc-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                <option value="all">ทุกสถานะ</option>
+                <option value="available">พร้อมขาย (Available)</option>
+                <option value="sold">ขายแล้ว (Sold)</option>
+              </select>
+            </div>
+            <div class="text-[11px] text-zinc-400">
+              💡 สต็อกสินค้าหน้าเว็บจะถูกผูกและคำนวณจากไอดีสถานะ <strong class="text-emerald-400">"พร้อมขาย"</strong> โดยอัตโนมัติ
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs admin-table">
+              <thead class="bg-zinc-900/90 text-zinc-400 uppercase tracking-wider font-mono border-b border-white/5">
+                <tr>
+                  <th class="py-3 px-4">สินค้าที่ผูก</th>
+                  <th class="py-3 px-4">Username</th>
+                  <th class="py-3 px-4">Password</th>
+                  <th class="py-3 px-4">หมายเหตุ / ข้อมูลผูก</th>
+                  <th class="py-3 px-4 text-center">สถานะ</th>
+                  <th class="py-3 px-4">คำสั่งซื้อที่ซื้อ</th>
+                  <th class="py-3 px-4 text-right">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="admin-vault-table-body" class="divide-y divide-white/5 text-zinc-300">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+          <div id="admin-vault-empty" class="hidden p-12 text-center text-zinc-500 text-xs">
+            ยังไม่มีไอดีในคลังสำหรับเงื่อนไขนี้
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: SELL SUBMISSIONS (รายการเสนอขายไอดีไก่จากผู้เล่น) -->
+      <section id="admin-sec-submissions" class="hidden space-y-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="glass-card p-5 rounded-2xl border border-white/5">
+            <span class="text-xs text-zinc-500 font-bold block mb-1">รายการส่งขายทั้งหมด</span>
+            <span id="metric-sub-total" class="text-3xl font-heading font-black text-white">0</span>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border border-white/5">
+            <span class="text-xs text-zinc-500 font-bold block mb-1">รอตรวจสอบ (Pending)</span>
+            <span id="metric-sub-pending" class="text-3xl font-heading font-black text-amber-400">0</span>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border border-white/5">
+            <span class="text-xs text-zinc-500 font-bold block mb-1">รับซื้อ &amp; โอนสำเร็จ</span>
+            <span id="metric-sub-paid" class="text-3xl font-heading font-black text-emerald-400">0</span>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border border-white/5">
+            <span class="text-xs text-zinc-500 font-bold block mb-1">ยอดเงินรับซื้อรวม</span>
+            <span id="metric-sub-amount" class="text-3xl font-heading font-black text-white">฿0.00</span>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-3xl border border-white/10 overflow-hidden shadow-xl">
+          <div class="p-4 border-b border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 bg-zinc-950/60">
+            <div class="flex items-center gap-3">
+              <span class="font-heading font-bold text-white text-sm">📥 รายการส่งขายไอดีไก่ &amp; บัญชีเกมจากผู้เล่น</span>
+              <select id="admin-sub-status-filter" onchange="filterAdminSubmissions(this.value)" class="bg-zinc-900 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500">
+                <option value="all">ทุกสถานะ</option>
+                <option value="pending">รอตรวจสอบ</option>
+                <option value="approved">อนุมัติ / รอโอนเงิน</option>
+                <option value="paid">โอนเงินสำเร็จ</option>
+                <option value="rejected">ปฏิเสธ</option>
+              </select>
+            </div>
+            <div class="text-[11px] text-zinc-400">
+              💡 แอดมินสามารถเปิดดูรหัสไอดี และกดปุ่ม <strong>"นำเข้าคลัง (Import to Vault)"</strong> เพื่อเติมสต็อกได้ในคลิกเดียว
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs admin-table">
+              <thead class="bg-zinc-900/90 text-zinc-400 uppercase tracking-wider font-mono border-b border-white/5">
+                <tr>
+                  <th class="py-3 px-4">รหัสรายการ</th>
+                  <th class="py-3 px-4">วันที่</th>
+                  <th class="py-3 px-4">ประเภทไอดี</th>
+                  <th class="py-3 px-4 text-center">จำนวน</th>
+                  <th class="py-3 px-4">ราคาเสนอขาย</th>
+                  <th class="py-3 px-4">บัญชีรับเงิน</th>
+                  <th class="py-3 px-4">ช่องทางติดต่อ</th>
+                  <th class="py-3 px-4 text-center">สถานะ</th>
+                  <th class="py-3 px-4 text-right">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="admin-submissions-table-body" class="divide-y divide-white/5 text-zinc-300">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+          <div id="admin-submissions-empty" class="hidden p-12 text-center text-zinc-500 text-xs">
+            ยังไม่มีรายการเสนอขายไอดีในระบบ
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: USERS & RBAC -->
+      <section id="admin-sec-users" class="hidden space-y-6">
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div class="glass-card p-5 rounded-2xl border border-white/5">
+            <span class="text-xs text-zinc-500 font-bold block mb-1">ผู้ใช้ทั้งหมดในระบบ</span>
+            <span id="metric-total-users" class="text-3xl font-heading font-black text-white">0</span>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border border-white/5">
+            <span class="text-xs text-zinc-500 font-bold block mb-1">ผู้ดูแลระบบ (ADMIN)</span>
+            <span id="metric-admin-users" class="text-3xl font-heading font-black text-amber-400">1</span>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border border-white/5">
+            <span class="text-xs text-zinc-500 font-bold block mb-1">สมาชิกทั่วไป (USER)</span>
+            <span id="metric-regular-users" class="text-3xl font-heading font-black text-zinc-400">0</span>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-3xl border border-white/10 overflow-hidden shadow-xl">
+          <div class="p-4 border-b border-white/5 bg-zinc-950/60 flex justify-between items-center">
+            <h3 class="font-heading font-bold text-white text-sm">👥 รายชื่อผู้ใช้งานและการจัดการสิทธิ์เข้าถึง (RBAC)</h3>
+            <span class="text-[11px] text-zinc-500">ผู้ใช้  จะได้รับสิทธิ์ SuperAdmin โดยอัตโนมัติ</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs admin-table">
+              <thead class="bg-zinc-900/90 text-zinc-400 uppercase tracking-wider font-mono border-b border-white/5">
+                <tr>
+                  <th class="py-3 px-4">ชื่อผู้ใช้ (Username)</th>
+                  <th class="py-3 px-4">อีเมล (Email)</th>
+                  <th class="py-3 px-4">ระดับสิทธิ์ (Role)</th>
+                  <th class="py-3 px-4">วันที่สมัคร</th>
+                  <th class="py-3 px-4 text-right">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="admin-users-table-body" class="divide-y divide-white/5 text-zinc-300">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: REVIEWS -->
+      <section id="admin-sec-reviews" class="hidden space-y-6">
+        <div class="glass-card rounded-3xl border border-white/10 overflow-hidden shadow-xl">
+          <div class="p-4 border-b border-white/5 bg-zinc-950/60 flex justify-between items-center">
+            <h3 class="font-heading font-bold text-white text-sm">⭐ จัดการรีวิวและความคิดเห็นจากลูกค้า</h3>
+            <span class="text-[11px] text-zinc-500">รีวิวจะแสดงที่หน้าแรกของร้านค้าเพื่อเพิ่มความน่าเชื่อถือ</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs admin-table">
+              <thead class="bg-zinc-900/90 text-zinc-400 uppercase tracking-wider font-mono border-b border-white/5">
+                <tr>
+                  <th class="py-3 px-4">วันที่</th>
+                  <th class="py-3 px-4">ผู้รีวิว</th>
+                  <th class="py-3 px-4">คะแนน</th>
+                  <th class="py-3 px-4">สินค้า / ออเดอร์</th>
+                  <th class="py-3 px-4">ข้อความรีวิว</th>
+                  <th class="py-3 px-4 text-right">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="admin-reviews-table-body" class="divide-y divide-white/5 text-zinc-300">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+          <div id="admin-reviews-empty" class="hidden p-12 text-center text-zinc-500 text-xs">
+            ยังไม่มีรีวิวในระบบ
+          </div>
+        </div>
+      </section>
+</main>
+
+  </div>
+
+  <!-- MODAL: ADD / EDIT PRODUCT MODAL (WITH IMAGE CUSTOMIZATION) -->
+  <div id="product-form-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+    <div class="bg-zinc-950 border border-white/10 rounded-3xl max-w-2xl w-full p-6 sm:p-8 relative my-8 shadow-2xl">
+      
+      <button onclick="closeProductModal()" class="absolute top-5 right-5 text-zinc-400 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-amber-500 text-xs font-mono font-bold uppercase tracking-widest">PRODUCT EDITOR</span>
+      </div>
+      <h3 id="product-modal-heading" class="text-2xl font-heading font-black text-white uppercase mb-6">
+        เพิ่มสินค้าใหม่
+      </h3>
+
+      <form id="product-crud-form" onsubmit="handleProductFormSubmit(event)" class="space-y-5">
+        <input type="hidden" id="prod-edit-id" value="">
+
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-bold text-zinc-400 mb-1.5">ชื่อสินค้า (Product Name):</label>
+            <input 
+              id="prod-name" 
+              type="text" 
+              placeholder="เช่น M4A1 Full Mod + T6 Ammo x300" 
+              class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+              required
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-zinc-400 mb-1.5">หมวดหมู่ (Category):</label>
+            <select id="prod-category" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+              <option value="ammo_acc">ไอดีไก่กระสุน (ammo_acc)</option>
+              <option value="koen">ไอดีเงิน Koen (koen)</option>
+              <option value="full_acc">ไอดีพร้อมเล่น (full_acc)</option>
+              <option value="skins">สกินปืน / ชุดเซ็ต (skins)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-zinc-400 mb-1.5">มูลค่า Koen (เช่น 15,000,000 หรือ 5.5M):</label>
+            <input 
+              id="prod-koen" 
+              type="text" 
+              placeholder="5,500,000" 
+              class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+              required
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-zinc-400 mb-1.5">ราคาจำหน่าย (บาท):</label>
+            <input 
+              id="prod-price" 
+              type="number" 
+              step="0.01" 
+              min="0" 
+              placeholder="350.00" 
+              class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+              required
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-zinc-400 mb-1.5">จำนวนสต็อก (ชิ้น):</label>
+            <input 
+              id="prod-stock" 
+              type="number" 
+              min="0" 
+              placeholder="10" 
+              class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- IMAGE MANAGEMENT & PRESETS -->
+        <div class="bg-zinc-900/60 p-4 rounded-2xl border border-white/5 space-y-3">
+          <div class="flex justify-between items-center">
+            <label class="block text-xs font-bold text-amber-400">
+              🖼️ URL รูปภาพหลัก (Main Image URL):
+            </label>
+            <span class="text-[10px] text-zinc-500">รองรับลิงก์รูปตรง หรือกดเลือกตัวอย่างด่วน</span>
+          </div>
+
+          <div class="flex gap-2">
+            <input 
+              id="prod-image" 
+              type="url" 
+              placeholder="https://images.unsplash.com/..." 
+              oninput="updateImagePreview(this.value)"
+              class="flex-1 bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+              required
+            />
+          </div>
+
+          <!-- Quick Image Presets -->
+          <div class="flex flex-wrap items-center gap-1.5 pt-1">
+            <span class="text-[10px] text-zinc-500 font-bold">เลือกรูปตัวอย่าง:</span>
+            <button type="button" onclick="setImagePreset('m4a1')" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[10px] px-2.5 py-1 rounded-lg transition-colors border border-white/5">ปืน M4A1</button>
+            <button type="button" onclick="setImagePreset('koen')" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[10px] px-2.5 py-1 rounded-lg transition-colors border border-white/5">กองเงิน Koen</button>
+            <button type="button" onclick="setImagePreset('sniper')" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[10px] px-2.5 py-1 rounded-lg transition-colors border border-white/5">สไนเปอร์ AX50</button>
+            <button type="button" onclick="setImagePreset('fal')" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[10px] px-2.5 py-1 rounded-lg transition-colors border border-white/5">ปืน FAL</button>
+            <button type="button" onclick="setImagePreset('wealth')" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[10px] px-2.5 py-1 rounded-lg transition-colors border border-white/5">มหาเศรษฐี VIP</button>
+            <button type="button" onclick="setImagePreset('smg')" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[10px] px-2.5 py-1 rounded-lg transition-colors border border-white/5">ปืน MPX</button>
+          </div>
+
+          <!-- Live Image Preview Box -->
+          <div class="aspect-video w-full rounded-xl overflow-hidden bg-black/60 border border-white/10 relative flex items-center justify-center">
+            <img id="image-preview-element" src="https://placehold.co/800x500/18181b/f59e0b?text=Image+Preview" alt="Preview" class="w-full h-full object-cover">
+          </div>
+
+          <!-- MULTI-IMAGE GALLERY URLS -->
+          <div class="pt-2 border-t border-white/5">
+            <label class="block text-xs font-bold text-zinc-300 mb-1">
+              📸 รูปภาพเพิ่มเติมในตัวไอดี / แกลเลอรี่ (Gallery Images — ใส่ URL บรรทัดละ 1 รูป):
+            </label>
+            <textarea 
+              id="prod-gallery" 
+              rows="2" 
+              placeholder="https://example.com/item1.jpg&#10;https://example.com/item2.jpg" 
+              class="w-full bg-zinc-900 border border-white/10 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-amber-500 font-mono leading-relaxed"
+            ></textarea>
+            <span class="text-[10px] text-zinc-500">สำหรับให้ลูกค้ากดสลับดูรูปของในตัวไอดีแบบคมชัดเหมือนเว็บ Moszxllshop</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-400 mb-1.5">แท็กสินค้า (คั่นด้วยเครื่องหมายจุลภาค , เช่น Best Seller, พร้อมบวก):</label>
+          <input 
+            id="prod-tags" 
+            type="text" 
+            placeholder="Best Seller, พร้อมบวก, คุ้มสุด" 
+            class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-400 mb-1.5">คำอธิบายสินค้า (Description):</label>
+          <textarea 
+            id="prod-desc" 
+            rows="2" 
+            placeholder="อธิบายจุดเด่นของไอดีนี้..." 
+            class="w-full bg-zinc-900 border border-white/10 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-amber-500 leading-relaxed"
+            required
+          ></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-400 mb-1.5">อุปกรณ์และสิ่งที่จะได้รับ (บรรทัดละ 1 ข้อ):</label>
+          <textarea 
+            id="prod-specs" 
+            rows="3" 
+            placeholder="เกราะ T5 ครบชุด&#10;กระสุน T6 x300&#10;Koen เงินสด 5.5M&#10;กระเป๋า 28 ช่อง" 
+            class="w-full bg-zinc-900 border border-white/10 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-amber-500 font-mono leading-relaxed"
+            required
+          ></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
+          <button type="button" onclick="closeProductModal()" class="px-5 py-2.5 rounded-xl text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors">
+            ยกเลิก
+          </button>
+          <button type="submit" id="btn-save-product" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-6 py-2.5 rounded-xl text-xs font-heading shadow-lg active:scale-95 transition-all">
+            บันทึกสินค้าลง Firebase
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <script type="module" src="../js/admin.js"></script>
+
+  <!-- MODAL: CATEGORY CRUD -->
+  <div id="category-form-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+    <div class="bg-zinc-950 border border-white/10 rounded-3xl max-w-lg w-full p-6 sm:p-8 relative my-8 shadow-2xl">
+      <button onclick="closeCategoryModal()" class="absolute top-5 right-5 text-zinc-400 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-amber-500 text-xs font-mono font-bold uppercase tracking-widest">CATEGORY EDITOR</span>
+      </div>
+      <h3 id="cat-modal-heading" class="text-2xl font-heading font-black text-white uppercase mb-6">
+        เพิ่มหมวดหมู่ใหม่
+      </h3>
+
+      <form id="category-crud-form" onsubmit="handleCategoryFormSubmit(event)" class="space-y-4">
+        <input type="hidden" id="cat-edit-id" value="">
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-400 mb-1.5">ชื่อหมวดหมู่ (Category Name):</label>
+          <input id="cat-name" type="text" placeholder="เช่น หมวดหมู่ไก่กระสุน T6" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500" required />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-400 mb-1.5">รหัสหมวดหมู่ (Category Slug / ID):</label>
+          <input id="cat-id" type="text" placeholder="เช่น ammo_acc หรือ koen_m" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-mono" required />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-400 mb-1.5">ลิงก์รูปภาพหน้าปกหมวดหมู่ (Image URL):</label>
+          <input id="cat-image" type="url" placeholder="https://images.unsplash.com/..." oninput="updateCatImagePreview(this.value)" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500" required />
+          <div class="mt-3 w-full h-32 rounded-xl bg-zinc-900 border border-white/10 overflow-hidden">
+            <img id="cat-image-preview" src="https://placehold.co/600x300/18181b/f59e0b?text=Category+Preview" alt="Preview" class="w-full h-full object-cover" />
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3 rounded-xl transition-all shadow-md text-xs uppercase tracking-wider font-heading mt-4">
+          บันทึกหมวดหมู่ (SAVE CATEGORY)
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ORDER FULFILLMENT / EDIT -->
+  <div id="order-fulfillment-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+    <div class="bg-zinc-950 border border-white/10 rounded-3xl max-w-lg w-full p-6 sm:p-8 relative my-8 shadow-2xl">
+      <button onclick="closeOrderModal()" class="absolute top-5 right-5 text-zinc-400 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-amber-500 text-xs font-mono font-bold uppercase tracking-widest">ORDER FULFILLMENT</span>
+      </div>
+      <h3 class="text-2xl font-heading font-black text-white uppercase mb-6">
+        แก้ไขการส่งมอบไอดี
+      </h3>
+
+      <form onsubmit="handleSaveOrderDelivery(event)" class="space-y-4">
+        <input type="hidden" id="edit-order-id" value="">
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-400 mb-1.5">สถานะออเดอร์:</label>
+          <select id="edit-order-status" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+            <option value="จัดส่งสำเร็จ">จัดส่งสำเร็จ (Completed)</option>
+            <option value="รอดำเนินการ">รอดำเนินการ (Pending)</option>
+            <option value="ยกเลิกคำสั่งซื้อ">ยกเลิกคำสั่งซื้อ (Cancelled)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-400 mb-1.5">Username ที่ส่งมอบให้ลูกค้า:</label>
+          <input id="edit-delivered-user" type="text" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500" required />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-400 mb-1.5">Password ที่ส่งมอบให้ลูกค้า:</label>
+          <input id="edit-delivered-pass" type="text" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500" required />
+        </div>
+
+        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3 rounded-xl transition-all shadow-md text-xs uppercase tracking-wider font-heading mt-4">
+          บันทึกการส่งมอบ (UPDATE ORDER)
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: VAULT SINGLE ACCOUNT ADD -->
+  <div id="vault-single-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+    <div class="bg-zinc-950 border border-white/10 rounded-3xl max-w-lg w-full p-6 sm:p-8 relative my-8 shadow-2xl">
+      <button onclick="closeVaultSingleModal()" class="absolute top-5 right-5 text-zinc-400 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-amber-500 text-xs font-mono font-bold uppercase tracking-widest">INVENTORY VAULT</span>
+      </div>
+      <h3 class="text-2xl font-heading font-black text-white uppercase mb-6">
+        เพิ่มไอดีเข้าตู้เซฟสต็อก
+      </h3>
+
+      <form onsubmit="handleVaultSingleSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-zinc-400 mb-1.5">เลือกสินค้าที่ผูก:</label>
+          <select id="vault-single-product-id" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500" required>
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-400 mb-1.5">Username / ID ล็อกอิน:</label>
+          <input id="vault-single-username" type="text" placeholder="เช่น AB_Agent_99" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500" required />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-400 mb-1.5">Password / รหัสผ่าน:</label>
+          <input id="vault-single-password" type="text" placeholder="เช่น Password#1234" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500" required />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-400 mb-1.5">หมายเหตุ / ข้อมูลผูกอีเมล (แสดงให้ลูกค้าเมื่อซื้อ):</label>
+          <input id="vault-single-note" type="text" placeholder="เช่น เมลสะอาด เปลี่ยนรหัสได้ทันที / มี 2FA Backup Code" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500" />
+        </div>
+
+        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3 rounded-xl transition-all shadow-md text-xs uppercase tracking-wider font-heading mt-4">
+          เพิ่มเข้าคลังสต็อก (DEPOSIT TO VAULT)
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: VAULT BULK IMPORT -->
+  <div id="vault-bulk-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+    <div class="bg-zinc-950 border border-white/10 rounded-3xl max-w-xl w-full p-6 sm:p-8 relative my-8 shadow-2xl">
+      <button onclick="closeVaultBulkModal()" class="absolute top-5 right-5 text-zinc-400 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-amber-500 text-xs font-mono font-bold uppercase tracking-widest">BULK VAULT IMPORT</span>
+      </div>
+      <h3 class="text-2xl font-heading font-black text-white uppercase mb-2">
+        นำเข้าไอดีจำนวนมาก (Bulk Import)
+      </h3>
+      <p class="text-zinc-400 text-xs mb-6">
+        วางรายการไอดีพร้อมรหัสผ่าน ระบบจะเพิ่มเข้าคลังและอัปเดตจำนวนสต็อกให้โดยอัตโนมัติ
+      </p>
+
+      <form onsubmit="handleVaultBulkSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-zinc-400 mb-1.5">เลือกสินค้าที่ต้องการเติมสต็อก:</label>
+          <select id="vault-bulk-product-id" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500" required>
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-400 mb-1.5">
+            รายการไอดี (1 บรรทัด = 1 ไอดี, รูปแบบ: username|password หรือ username:password|หมายเหตุ):
+          </label>
+          <textarea 
+            id="vault-bulk-textarea" 
+            rows="6" 
+            placeholder="agent_01|pass123&#10;agent_02|pass456|เมลสะอาด&#10;agent_03:pass789" 
+            class="w-full bg-zinc-900 border border-white/10 rounded-2xl p-4 text-xs text-white focus:outline-none focus:border-amber-500 font-mono leading-relaxed"
+            required
+          ></textarea>
+        </div>
+
+        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3.5 rounded-xl transition-all shadow-md text-xs uppercase tracking-wider font-heading mt-2">
+          🚀 นำเข้าข้อมูลเข้าคลังทันที (IMPORT ALL)
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: SUBMISSION DETAILS & VAULT IMPORT -->
+  <div id="submission-detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+    <div class="bg-zinc-950 border border-white/10 rounded-3xl max-w-xl w-full p-6 sm:p-8 relative my-8 shadow-2xl">
+      <button onclick="closeSubmissionModal()" class="absolute top-5 right-5 text-zinc-400 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-amber-500 text-xs font-mono font-bold uppercase tracking-widest">SUBMISSION DETAILS</span>
+      </div>
+      <h3 id="sub-modal-id" class="text-2xl font-heading font-black text-white uppercase mb-4">
+        รายละเอียดงานส่งขายไอดี
+      </h3>
+
+      <div id="sub-modal-content" class="space-y-4 text-xs text-zinc-300">
+        <!-- Populated via JS -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>

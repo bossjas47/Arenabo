@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TACTICAL STORE — Arena Breakout Instant Market</title>
+  
+  <!-- Google Fonts: Outfit & Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['Outfit', 'Prompt', 'sans-serif'],
+            body: ['Prompt', 'sans-serif']
+          },
+          colors: {
+            tactical: {
+              black: '#050505',
+              card: '#0c0c0e',
+              amber: '#f59e0b',
+              amberHover: '#d97706',
+              border: 'rgba(255, 255, 255, 0.08)',
+              glow: 'rgba(245, 158, 11, 0.15)'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="selection:bg-amber-500/30 selection:text-white pb-20 md:pb-0 bg-[#050505] text-zinc-300">
+
+  <!-- Toast Notification Wrapper -->
+  <div id="toast-box" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 -translate-y-4 scale-95 flex items-center gap-3 bg-zinc-900 border border-amber-500/50 text-white px-5 py-3 rounded-2xl shadow-2xl backdrop-blur-xl">
+    <svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+    </svg>
+    <span id="toast-text" class="text-xs md:text-sm font-medium">ข้อความแจ้งเตือน</span>
+  </div>
+
+  <!-- LIVE ORDER TICKER NOTIFICATION (Bottom Left like Moszxllshop) -->
+  <div id="live-order-ticker" class="fixed bottom-24 md:bottom-6 left-4 z-40 hidden pointer-events-none transition-all duration-500">
+    <div class="glass-card border border-amber-500/30 bg-zinc-950/95 p-3.5 rounded-2xl shadow-2xl flex items-center gap-3 max-w-sm pointer-events-auto">
+      <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-500 shrink-0">
+        <span class="text-lg">⚡</span>
+      </div>
+      <div class="flex flex-col text-left">
+        <div class="flex items-center gap-1.5 text-[10px] text-zinc-400">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+          <span id="ticker-time" class="font-mono">เมื่อ 1 นาทีที่แล้ว</span>
+        </div>
+        <div class="text-xs font-bold text-white line-clamp-1" id="ticker-product">
+          ลูกค้าเพิ่งสั่งซื้อ: M4A1 Full Mod
+        </div>
+        <div class="text-[10px] text-amber-400 font-mono" id="ticker-price">
+          จัดส่งสำเร็จ • ฿350.00
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Announcement Marquee Header -->
+  <div class="bg-amber-500 text-black font-bold text-xs uppercase tracking-wider py-2 overflow-hidden flex w-full relative z-40 select-none shadow-md">
+    <div class="animate-marquee-track flex items-center" id="marquee-track-container">
+      <span class="mx-4 flex items-center gap-1.5">
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        ระบบจัดส่งไอดีอัตโนมัติ 24 ชม. ได้รับรหัสทันทีหลังชำระเงิน
+      </span>
+      <span class="mx-4 text-black/50">•</span>
+      <span class="mx-4">🔒 รับประกันทุกไอดี ปลอดภัย ไม่เสี่ยงโดนแบน บัญชีสะอาด 100%</span>
+      <span class="mx-4 text-black/50">•</span>
+      <span class="mx-4">🎁 โค้ดส่วนลด: TACTICAL ลด 50 บาท | ARENA10 ลด 10% | MOSZXLL ลด 100 บาท</span>
+      <span class="mx-4 text-black/50">•</span>
+      <span class="mx-4 flex items-center gap-1.5">
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        คลังสต็อกไอดีพร้อมส่ง Arena Breakout อันดับ 1
+      </span>
+      <span class="mx-4 text-black/50">•</span>
+      <span class="mx-4">🔒 เปลี่ยนรหัสและผูกเมลได้ทันที มีประกันหลังการขาย</span>
+    </div>
+  </div>
+
+  <!-- Main Top Navigation -->
+  <nav class="sticky top-0 z-40 border-b border-white/5 bg-[#050505]/90 backdrop-blur-2xl">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 h-16 flex justify-between items-center">
+      
+      <!-- Logo -->
+      <div onclick="navigateTo('store')" class="flex items-center gap-3 cursor-pointer group">
+        <div class="w-9 h-9 bg-amber-500 text-black flex items-center justify-center rounded-xl font-black text-xl shadow-[0_0_15px_rgba(245,158,11,0.4)] group-hover:scale-105 transition-transform">
+          <svg class="w-5 h-5 group-hover:rotate-90 transition-transform duration-500 stroke-black fill-none" stroke-width="2.5" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xl font-heading font-black text-white tracking-wider uppercase leading-none">
+            TACTICAL<span class="text-amber-500">STORE</span>
+          </span>
+          <span class="text-[10px] text-zinc-500 tracking-widest uppercase">Arena Breakout Market</span>
+        </div>
+      </div>
+
+            <!-- Desktop Links -->
+      <div class="hidden md:flex items-center gap-5 text-sm font-semibold">
+        <button onclick="navigateTo('store')" class="text-white hover:text-amber-400 transition-colors">หน้าแรก</button>
+        <a href="front/category.html" class="text-zinc-400 hover:text-amber-400 transition-colors">สินค้า</a>
+        
+        <!-- Track Order Button -->
+        <button onclick="openOrderTrackingModal()" class="text-zinc-400 hover:text-amber-400 transition-colors flex items-center gap-1.5" title="ค้นหาประวัติออเดอร์ด้วย Order ID">
+          <span>🔍</span>
+          <span>ค้นหาออเดอร์</span>
+        </button>
+
+        <!-- Sell Account to Store Button -->
+        <button onclick="openSellAccountModal()" class="text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1.5 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 text-xs font-bold" title="รับซื้อไอดีไก่ 61 / ไก่เงิน M">
+          <span>💰</span>
+          <span>ส่งขายไอดี</span>
+        </button>
+
+        <!-- My Orders Button -->
+        <button onclick="openMyOrdersModal()" class="text-zinc-400 hover:text-amber-400 transition-colors flex items-center gap-1.5">
+          <span>📦</span>
+          <span>ออเดอร์ของฉัน</span>
+          <span id="nav-order-badge" class="hidden bg-amber-500 text-black text-[10px] px-1.5 py-0.2 rounded-full font-bold">0</span>
+        </button>
+
+        <!-- Account Link -->
+        <a href="front/account.html" class="text-zinc-400 hover:text-amber-400 transition-colors flex items-center gap-1.5 text-xs bg-zinc-900/80 px-3.5 py-1.5 rounded-full border border-white/5 hover:border-amber-500/40">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          <span>บัญชี</span>
+        </a>
+
+        <!-- Firebase Status -->
+        <div id="firebase-status-badge" class="flex items-center gap-1.5 text-zinc-400 bg-zinc-900/80 px-2.5 py-1 rounded-full border border-white/5 text-[11px]">
+          <span id="firebase-status-dot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="firebase-status-text">LIVE</span>
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="flex items-center gap-3">
+        <div class="relative hidden sm:block">
+          <input 
+            id="search-input" 
+            type="text" 
+            placeholder="ค้นหาไอดี ปืน กระสุน..." 
+            oninput="handleSearch(this.value)"
+            class="bg-zinc-900/90 border border-white/10 rounded-full pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-amber-500/60 w-44 lg:w-60 transition-all"
+          />
+          <svg class="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
+
+        <button onclick="openCartDrawer()" class="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 border border-white/10 hover:border-amber-500/40 px-3.5 py-2 rounded-full transition-all text-xs font-bold relative group">
+          <div class="relative">
+            <svg class="w-4 h-4 text-amber-500 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            <span id="nav-cart-badge" class="absolute -top-2 -right-2 bg-amber-500 text-black text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
+          </div>
+          <span id="nav-cart-text" class="font-heading text-white">฿0.00</span>
+        </button>
+
+        <!-- Authentication Header Components -->
+        <div id="auth-logged-out" class="flex items-center gap-2">
+          <a href="front/login.html?mode=login" class="flex items-center gap-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/10 px-3.5 py-2 rounded-full transition-all font-bold text-xs hover:border-amber-500/30">
+            เข้าสู่ระบบ
+          </a>
+          <a href="front/login.html?mode=register" class="hidden sm:flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-black px-4 py-2 rounded-full transition-all font-bold text-xs shadow-[0_0_15px_rgba(245,158,11,0.3)] hover:scale-105 active:scale-95">
+            สมัครสมาชิก
+          </a>
+        </div>
+
+        <div id="auth-logged-in" class="hidden items-center gap-2">
+          <a href="front/account.html" class="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 border border-amber-500/30 px-3 py-1.5 rounded-full shrink-0 group transition-all" title="จัดการบัญชี">
+            <div class="w-6 h-6 rounded-full bg-amber-500 text-black font-black text-[11px] flex items-center justify-center shrink-0">
+              <span id="user-avatar-initial">A</span>
+            </div>
+            <span id="user-display-name" class="text-xs font-bold text-white max-w-[100px] truncate group-hover:text-amber-400">Agent</span>
+          </a>
+
+          <button onclick="handleSignOut()" class="text-xs text-zinc-400 hover:text-red-400 bg-zinc-900/60 hover:bg-zinc-800 p-2 rounded-full transition-colors border border-white/5" title="ออกจากระบบ">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </nav>
+
+  <!-- VIEW 1: STOREFRONT SECTION -->
+  <div id="view-store" class="block transition-opacity duration-300">
+    
+    <!-- Hero Banner (Cinematic Tactical Gaming Vibe) -->
+    <section class="relative w-full border-b border-white/5 bg-[#080808] overflow-hidden py-16 md:py-24">
+      <div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(245,158,11,0.15),rgba(255,255,255,0))] pointer-events-none"></div>
+      <div class="absolute -right-20 top-0 w-96 h-96 bg-amber-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 relative z-10 flex flex-col items-start justify-center">
+        <div class="inline-flex items-center gap-2 text-amber-500 text-xs font-bold uppercase tracking-widest mb-6 border border-amber-500/30 bg-amber-500/10 px-3.5 py-1.5 rounded-full backdrop-blur-sm">
+          <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+          Instant Delivery • Arena Breakout Market
+        </div>
+        
+        <h1 class="text-4xl sm:text-6xl md:text-8xl font-heading font-black text-white leading-[0.95] mb-6 tracking-tight uppercase">
+          YOUR NEXT GAME<br/>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-200">
+            STARTS HERE.
+          </span>
+        </h1>
+        
+        <p class="text-zinc-400 text-base md:text-xl max-w-2xl mb-8 font-light leading-relaxed">
+          เลือกเกมที่ใช่ แล้วไปลุยกัน ศูนย์รวมไอดีไก่กระสุน T6 เงิน Koen มหาเศรษฐี และไอดีพร้อมเล่น Arena Breakout ส่งมอบอัตโนมัติใน 3 วินาที พร้อมประกัน 100%
+        </p>
+        
+        <div class="flex flex-wrap items-center gap-4">
+          <button onclick="scrollToCatalog()" class="flex items-center gap-2 bg-amber-500 text-black px-8 py-3.5 rounded-full font-bold text-base hover:bg-white transition-all shadow-[0_0_25px_rgba(245,158,11,0.35)] group active:scale-95 font-heading uppercase">
+            เลือกซื้อไอดีเลย 
+            <svg class="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            </svg>
+          </button>
+
+          <button onclick="openSellAccountModal()" class="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-amber-400 border border-amber-500/30 hover:border-amber-500 px-6 py-3.5 rounded-full font-bold text-base transition-all shadow-md hover:scale-105 active:scale-95">
+            <span>💰</span>
+            ส่งขายไอดีไก่ / รับเงินสด
+          </button>
+          
+          <button onclick="openOrderTrackingModal()" class="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white border border-white/10 hover:border-amber-500/40 px-6 py-3.5 rounded-full font-bold text-base transition-all">
+            <span>🔍</span>
+            ค้นหา / เช็คออเดอร์
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Metrics & Trust Stats Bar -->
+    <section class="border-b border-white/5 bg-[#050505]">
+      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 grid grid-cols-2 md:grid-cols-4 gap-4 divide-x divide-white/5 text-center">
+        <div class="flex flex-col">
+          <span class="text-2xl md:text-3xl font-heading font-black text-white">45.2K+</span>
+          <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider">สมาชิกในระบบ</span>
+        </div>
+        <div class="flex flex-col">
+          <span id="hero-instock-count" class="text-2xl md:text-3xl font-heading font-black text-amber-500">1,405</span>
+          <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider">ไอดีพร้อมส่ง</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-2xl md:text-3xl font-heading font-black text-white">89.5K+</span>
+          <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider">ออเดอร์สำเร็จ</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-2xl md:text-3xl font-heading font-black text-emerald-400">3 วินาที</span>
+          <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider">เวลาจัดส่งเฉลี่ย</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Catalog Section with Category Tabs and Product Grid -->
+    <main id="catalog-section" class="max-w-[1400px] mx-auto px-4 sm:px-6 py-16 w-full">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 border-b border-white/10 pb-6 gap-6">
+        <div>
+          <div class="flex items-center gap-2 text-amber-500 text-xs font-bold uppercase tracking-wider mb-2">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3" stroke-width="2"/></svg>
+            MOSZXLL STYLE INSTANT MARKET
+          </div>
+          <h2 class="text-3xl md:text-4xl font-heading font-black text-white tracking-tight uppercase">
+            เลือกสินค้าและทรัพยากร
+          </h2>
+          <p class="text-zinc-500 text-sm mt-1">คลิกที่การ์ดเพื่อดูภาพถ่ายอุปกรณ์ในตัวไอดี หรือกดสั่งซื้อเพื่อชำระเงินอัตโนมัติ</p>
+        </div>
+
+        <!-- Filter & Sorting Controls (like Moszxllshop) -->
+        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+          
+          <!-- Stock Filter Toggle -->
+          <div class="flex bg-zinc-900 p-1 rounded-2xl border border-white/10 text-xs">
+            <button id="filter-stock-all" onclick="setStockFilter('all')" class="px-3.5 py-1.5 rounded-xl font-bold transition-all bg-amber-500 text-black">
+              ทั้งหมด
+            </button>
+            <button id="filter-stock-instock" onclick="setStockFilter('instock')" class="px-3.5 py-1.5 rounded-xl font-bold transition-all text-zinc-400 hover:text-white">
+              เฉพาะพร้อมส่ง
+            </button>
+          </div>
+
+          <!-- Sort Select -->
+          <select id="sort-select" onchange="handleSortChange(this.value)" class="bg-zinc-900 border border-white/10 rounded-2xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+            <option value="default">เรียงตาม: แนะนำ</option>
+            <option value="price-asc">ราคา: ต่ำสุด - สูงสุด</option>
+            <option value="price-desc">ราคา: สูงสุด - ต่ำสุด</option>
+            <option value="stock-desc">สต็อก: มากที่สุด</option>
+          </select>
+
+        </div>
+      </div>
+
+      <!-- Category Filter Tabs -->
+      <div id="category-tabs" class="flex flex-wrap gap-2 mb-8">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Products Grid -->
+      <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Empty State for Search / Filter -->
+      <div id="empty-state" class="hidden py-24 text-center flex-col items-center justify-center border border-dashed border-white/10 rounded-3xl bg-zinc-950">
+        <svg class="w-12 h-12 text-zinc-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <h3 class="text-lg font-bold text-white mb-1">ไม่พบสินค้าที่คุณค้นหา</h3>
+        <p class="text-zinc-500 text-xs">กรุณาลองเปลี่ยนคำค้นหา หรือเลือกหมวดหมู่อื่น</p>
+        <button onclick="clearSearchAndFilters()" class="mt-4 text-xs font-bold text-amber-500 hover:underline">
+          ล้างการค้นหาทั้งหมด
+        </button>
+      </div>
+    </main>
+
+    <!-- Partner Banner (Inspired by Moszxllshop x Applemint Topup) -->
+    <section class="max-w-[1400px] mx-auto px-4 sm:px-6 pb-20">
+      <div class="bg-gradient-to-r from-zinc-950 via-zinc-900 to-black border border-white/10 rounded-3xl p-8 md:p-12 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 group shadow-2xl">
+        <div class="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 blur-[120px] rounded-full pointer-events-none group-hover:bg-amber-500/20 transition-all duration-700"></div>
+        
+        <div class="relative z-10 text-center md:text-left">
+          <div class="inline-flex items-center gap-2 text-amber-500 text-xs font-bold uppercase tracking-widest mb-3 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+            OFFICIAL PARTNER <span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> พันธมิตรเติมเกม
+          </div>
+          <h3 class="text-3xl md:text-4xl font-heading font-black text-white mb-2 uppercase tracking-tight">
+            TACTICAL TOPUP &amp; PASS
+          </h3>
+          <p class="text-zinc-400 max-w-lg text-sm leading-relaxed">
+            บริการเติมพันธบัตร Arena Breakout แท้ เติมผ่าน UID ปลอดภัย 100% ไม่เสี่ยงติดลบหรือโดนแบน บัญชีสะอาด
+          </p>
+        </div>
+        
+        <div class="relative z-10 w-full md:w-auto shrink-0 flex flex-col sm:flex-row gap-3">
+          <button onclick="triggerToast('เปิดบริการเติมเกมพันธมิตรเร็วๆ นี้')" class="bg-white text-black font-bold px-8 py-3.5 rounded-2xl flex items-center justify-center gap-2 hover:bg-amber-500 transition-all shadow-xl active:scale-95 text-xs font-heading">
+            <span>เติมเกม Arena Breakout</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+          <a href="front/account.html" class="bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/10 font-bold px-5 py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all text-xs">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            <span>จัดการบัญชีของฉัน</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it Works Section -->
+    <section class="border-t border-white/5 bg-[#080808] py-20">
+      <div class="max-w-[1400px] mx-auto px-4 sm:px-6">
+        <div class="mb-14 text-center md:text-left">
+          <span class="text-amber-500 text-xs font-bold uppercase tracking-widest">TRANSPARENT SYSTEM</span>
+          <h2 class="text-3xl md:text-4xl font-heading font-black text-white uppercase tracking-tight mt-1">HOW IT WORKS</h2>
+          <p class="text-zinc-500 text-sm mt-1">ขั้นตอนการสั่งซื้อง่ายๆ รวดเร็ว และจัดส่งอัตโนมัติภายใน 3 วินาที</p>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8 text-left">
+          <div class="relative bg-zinc-950 border border-white/5 p-8 rounded-3xl hover:border-amber-500/40 transition-colors group">
+            <div class="w-12 h-12 bg-zinc-900 border border-white/10 flex items-center justify-center rounded-2xl mb-6 text-white font-heading font-black text-lg group-hover:border-amber-500 transition-colors">
+              01
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">เลือกไอดีและส่องรูปของในตัว</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">คลิกดูภาพถ่ายของในตัว สกินปืน และมูลค่า Koen ในแต่ละไอดีให้ครบถ้วนก่อนยืนยันสั่งซื้อ</p>
+          </div>
+
+          <div class="relative bg-zinc-950 border border-white/5 p-8 rounded-3xl hover:border-amber-500/40 transition-colors group">
+            <div class="w-12 h-12 bg-zinc-900 border border-white/10 flex items-center justify-center rounded-2xl mb-6 text-white font-heading font-black text-lg group-hover:border-amber-500 transition-colors">
+              02
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">สแกน QR หรือใส่ซองของขวัญ</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">ชำระเงินผ่าน PromptPay QR หรือ TrueMoney ระบบตรวจสอบยอดอัตโนมัติใน 3 วินาที</p>
+          </div>
+
+          <div class="relative bg-zinc-950 border border-white/5 p-8 rounded-3xl hover:border-amber-500/40 transition-colors group">
+            <div class="w-12 h-12 bg-zinc-900 border border-white/10 flex items-center justify-center rounded-2xl mb-6 text-white font-heading font-black text-lg group-hover:border-amber-500 transition-colors">
+              03
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">รับไอดีและดูย้อนหลังได้ตลอด</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">ระบบนำส่ง Username:Password ให้บนหน้าจอทันที และบันทึกใน "ออเดอร์ของฉัน" ดูได้ตลอดเวลา</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    
+    <!-- SECTION: CUSTOMER REVIEWS & STORE CREDIBILITY (MOSZXLLSHOP FEEDBACK) -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 py-16 border-t border-white/5">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+        <div>
+          <div class="inline-flex items-center gap-2 text-amber-500 text-xs font-mono font-bold uppercase tracking-widest mb-2 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+            <span>⭐</span> VERIFIED REVIEWS &amp; CREDITS
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-heading font-black text-white uppercase tracking-tight">
+            เสียงตอบรับจาก<span class="text-amber-500">ผู้เล่นจริง</span>
+          </h2>
+          <p class="text-zinc-400 text-xs mt-1">
+            ความพึงพอใจ 4.9/5.0 ดาว จากคำสั่งซื้อส่งมอบไอดีสำเร็จมากกว่า 1,280+ รายการ
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button onclick="openReviewModal()" class="bg-zinc-900 hover:bg-zinc-800 text-amber-400 border border-amber-500/30 hover:border-amber-500 font-bold px-4 py-2.5 rounded-2xl text-xs flex items-center gap-1.5 transition-all shadow-md">
+            <span>✍️</span> เขียนรีวิวร้านค้า
+          </button>
+        </div>
+      </div>
+
+      <div id="reviews-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+<footer class="border-t border-white/5 bg-[#050505] py-12">
+      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
+        <div>
+          <div class="flex items-center justify-center md:justify-start gap-2 text-lg font-heading font-black text-white mb-1">
+            <span class="text-amber-500">✦</span> TACTICALSTORE
+          </div>
+          <p class="text-zinc-600 text-xs">© 2026 Tactical Store — ระบบจำหน่ายไอดีและทรัพยากรเกม Arena Breakout อัตโนมัติ 24 ชม.</p>
+        </div>
+        <div class="flex flex-wrap justify-center gap-6 text-xs font-semibold text-zinc-500">
+          <button onclick="navigateTo('store')" class="hover:text-white transition-colors">หน้าหลัก</button>
+          <button onclick="openMyOrdersModal()" class="hover:text-white transition-colors">ออเดอร์ของฉัน</button>
+          <a href="front/account.html" class="hover:text-amber-400 transition-colors">หมวดหมู่บัญชี (Account)</a>
+          <button onclick="triggerToast('เงื่อนไข: กรุณาเปลี่ยนรหัสผ่านและผูกอีเมลหลังรับไอดีทันที')" class="hover:text-white transition-colors">ข้อกำหนดการใช้งาน</button>
+          <button onclick="triggerToast('ติดต่อฝ่ายสนับสนุนทาง Line ID: @tacticalstore')" class="hover:text-white transition-colors">ติดต่อเรา</button>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- VIEW 2: CHECKOUT / PAYMENT SCREEN -->
+  <div id="view-checkout" class="hidden min-h-screen py-10 md:py-16">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6">
+      <button onclick="navigateTo('store')" class="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-8 w-fit font-bold text-sm bg-zinc-900/60 px-4 py-2 rounded-full border border-white/5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        ยกเลิกและกลับไปหน้าร้าน
+      </button>
+
+      <div class="grid lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left: Summary Details -->
+        <div class="lg:col-span-5 bg-zinc-950 border border-white/10 p-6 md:p-8 rounded-3xl shadow-xl">
+          <div class="flex items-center justify-between mb-6 pb-4 border-b border-white/5">
+            <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-widest">สรุปคำสั่งซื้อ</h2>
+            <span class="text-[10px] bg-amber-500/10 text-amber-500 border border-amber-500/20 px-2.5 py-0.5 rounded font-mono font-bold">
+              LOCKING IN STOCK
+            </span>
+          </div>
+          
+          <div class="flex flex-col gap-5 mb-6">
+            <div class="aspect-video w-full rounded-2xl overflow-hidden border border-white/10 relative">
+              <img id="checkout-product-img" src="" alt="Product" class="w-full h-full object-cover">
+              <div id="checkout-product-koen" class="absolute top-2 left-2 bg-black/80 backdrop-blur-md px-2.5 py-1 rounded text-[11px] font-bold text-amber-400">
+                Koen: -
+              </div>
+            </div>
+            <div>
+              <h3 id="checkout-product-name" class="font-bold text-lg text-white mb-1">-</h3>
+              <p id="checkout-product-desc" class="text-zinc-500 text-xs leading-relaxed">-</p>
+            </div>
+          </div>
+
+          <!-- Promo Code Input with Rate Limiting -->
+          <div class="pt-4 border-t border-white/5 mb-6">
+            <div class="text-xs font-bold text-zinc-400 mb-2 flex items-center justify-between">
+              <span class="flex items-center gap-1.5">🏷️ โค้ดส่วนลด (ลองใส่: TACTICAL หรือ ARENA10)</span>
+              <span id="promo-rate-warning" class="hidden text-[10px] text-red-400 font-bold">กรอกถี่เกินไป</span>
+            </div>
+            <div class="flex gap-2">
+              <input 
+                id="promo-input" 
+                type="text" 
+                placeholder="ใส่รหัสคูปอง..." 
+                class="bg-zinc-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white uppercase focus:outline-none focus:border-amber-500 flex-1 font-mono"
+              />
+              <button id="btn-apply-promo" onclick="applyPromoCode()" class="bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition-colors">
+                ใช้โค้ด
+              </button>
+            </div>
+          </div>
+          
+          <!-- Pricing Line Items -->
+          <div class="space-y-3 text-xs text-zinc-400 border-t border-white/5 pt-4">
+            <div class="flex justify-between items-center">
+              <span>ราคาสินค้า</span>
+              <span id="checkout-base-price" class="font-heading text-white text-sm">฿0.00</span>
+            </div>
+            <div id="discount-row" class="hidden justify-between items-center text-emerald-400">
+              <span>ส่วนลดโปรโมชั่น</span>
+              <span id="checkout-discount" class="font-heading text-sm">-฿0.00</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span>ค่าธรรมเนียมระบบอัตโนมัติ</span>
+              <span class="text-emerald-400 font-bold">ฟรี (฿0.00)</span>
+            </div>
+            <div class="flex justify-between items-end pt-4 border-t border-white/5 mt-4">
+              <span class="text-xs text-zinc-300 font-bold">ยอดสุทธิที่ต้องชำระ</span>
+              <span id="checkout-final-price" class="text-3xl font-heading font-black text-amber-500 tracking-tight">
+                ฿0.00
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Payment Methods Panel -->
+        <div class="lg:col-span-7 bg-zinc-950 border border-amber-500/30 p-6 md:p-10 rounded-3xl relative overflow-hidden flex flex-col items-center shadow-2xl">
+          
+          <!-- Expiry Timer Notice -->
+          <div class="absolute top-0 inset-x-0 bg-red-500/10 border-b border-red-500/20 text-red-400 text-xs py-2 px-4 flex items-center justify-center gap-2 font-bold tracking-wide">
+            <svg class="w-3.5 h-3.5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><polyline points="12 6 12 12 16 14" stroke-width="2"/></svg>
+            กรุณาชำระเงินและกดยืนยันภายใน <span id="checkout-timer" class="font-mono text-white ml-1">10:00</span> นาที
+          </div>
+
+          <!-- Payment Mode Switcher -->
+          <div class="mt-8 mb-6 flex bg-zinc-900 p-1 rounded-2xl w-full max-w-sm border border-white/5">
+            <button id="btn-tab-promptpay" onclick="switchPaymentTab('promptpay')" class="flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all bg-amber-500 text-black shadow-md">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" stroke-width="2"/><rect x="14" y="3" width="7" height="7" stroke-width="2"/><rect x="14" y="14" width="7" height="7" stroke-width="2"/><rect x="3" y="14" width="7" height="7" stroke-width="2"/></svg>
+              PromptPay QR
+            </button>
+            <button id="btn-tab-truemoney" onclick="switchPaymentTab('truemoney')" class="flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all text-zinc-400 hover:text-white">
+              <span>🎁</span> ซอง TrueMoney
+            </button>
+          </div>
+
+          <!-- TAB 1: PromptPay QR Container -->
+          <div id="payment-promptpay-panel" class="flex flex-col items-center w-full">
+            <div class="text-center mb-6">
+              <h3 class="text-xl font-heading font-black text-white uppercase">สแกนชำระผ่านพร้อมเพย์</h3>
+              <p class="text-zinc-400 text-xs mt-1">ระบบ SlipOK ตรวจสอบอัตโนมัติ ไม่ต้องส่งสลิปให้แอดมิน</p>
+            </div>
+
+            <!-- QR Container Frame -->
+            <div class="bg-white p-5 rounded-3xl mb-6 relative group shadow-2xl">
+              <div id="qr-box-content" class="w-56 h-56 bg-zinc-100 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-zinc-300 relative overflow-hidden">
+                <svg class="w-24 h-24 text-zinc-700 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                </svg>
+                <span class="font-heading font-black text-[10px] text-zinc-800 tracking-wider">PROMPTPAY THAILAND</span>
+                <span id="qr-amount-label" class="font-heading font-bold text-amber-600 text-base">฿0.00</span>
+                
+                <!-- Overlay Simulation Button on Hover -->
+                <div class="absolute inset-0 bg-black/90 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center p-4 text-center">
+                  <p class="text-zinc-400 text-xs mb-3">กดเพื่อจำลองว่าโอนเงินสำเร็จ</p>
+                  <button onclick="simulateOrderSuccess()" class="w-full bg-amber-500 text-black font-bold py-2.5 px-4 rounded-xl hover:bg-white transition-all text-xs shadow-lg">
+                    [จำลอง] ชำระเงินสำเร็จ
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="w-full max-w-sm space-y-2 text-xs">
+              <div class="flex items-center justify-between bg-zinc-900 px-4 py-2.5 rounded-xl border border-white/5">
+                <span class="text-zinc-400">ชื่อบัญชี:</span>
+                <span class="text-white font-semibold">บจก. แทคติคอล สโตร์ (ไทยแลนด์)</span>
+              </div>
+              <div class="flex items-center justify-between bg-zinc-900 px-4 py-2.5 rounded-xl border border-white/5">
+                <span class="text-zinc-400">ยอดที่ต้องชำระ:</span>
+                <span id="promptpay-sum-label" class="text-amber-500 font-heading font-black text-sm">฿0.00</span>
+              </div>
+            </div>
+
+            <!-- Bank Slip Upload Zone (SlipOK Verification) -->
+            <div class="w-full max-w-sm mt-4">
+              <label class="block text-xs font-bold text-zinc-300 mb-2 flex items-center justify-between">
+                <span>📸 แนบสลิปการโอนเงิน (Slip Verification):</span>
+                <span class="text-[10px] text-amber-500 font-normal">ระบบตรวจสอบอัตโนมัติ</span>
+              </label>
+              
+              <div id="slip-dropzone" onclick="document.getElementById('slip-file-input').click()" class="border-2 border-dashed border-white/15 hover:border-amber-500/60 rounded-2xl p-4 text-center cursor-pointer bg-zinc-900/60 hover:bg-zinc-900 transition-all">
+                <input type="file" id="slip-file-input" accept="image/*" class="hidden" onchange="handleSlipFileChange(event)">
+                
+                <div id="slip-upload-prompt" class="flex flex-col items-center gap-1.5 py-1">
+                  <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                  <span class="text-xs text-zinc-300 font-bold">คลิกเพื่ออัปโหลดสลิป หรือลากไฟล์มาวาง</span>
+                  <span class="text-[10px] text-zinc-500">รองรับไฟล์ JPG, PNG, WEBP จากทุกแอปธนาคาร</span>
+                </div>
+
+                <div id="slip-preview-container" class="hidden flex items-center justify-between gap-3 bg-zinc-950 p-2.5 rounded-xl border border-emerald-500/30">
+                  <div class="flex items-center gap-2.5 overflow-hidden">
+                    <img id="slip-preview-img" src="" alt="Slip Preview" class="w-10 h-10 object-cover rounded-lg border border-white/10 shrink-0">
+                    <div class="text-left overflow-hidden">
+                      <div id="slip-filename" class="text-xs text-white font-bold truncate">slip_transfer.jpg</div>
+                      <div class="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> สลิปพร้อมตรวจสอบ
+                      </div>
+                    </div>
+                  </div>
+                  <button type="button" onclick="event.stopPropagation(); removeSlipFile();" class="text-zinc-500 hover:text-red-400 p-1 text-xs" title="ลบสลิป">✕</button>
+                </div>
+              </div>
+            </div>
+
+            <button id="btn-verify-promptpay" onclick="simulateOrderSuccess()" class="mt-5 w-full max-w-sm bg-amber-500 hover:bg-amber-400 text-black font-bold py-3.5 rounded-2xl transition-all shadow-lg text-sm active:scale-95 flex items-center justify-center gap-2 font-heading">
+              <span>ยืนยันการโอนเงิน (ตรวจสลิปอัตโนมัติ)</span>
+            </button>
+          </div>
+
+          <!-- TAB 2: TrueMoney Voucher Container -->
+          <div id="payment-truemoney-panel" class="hidden flex-col items-center w-full max-w-sm">
+            <div class="text-center mb-6">
+              <h3 class="text-xl font-heading font-black text-white uppercase">กรอกลิงก์ซองของขวัญ</h3>
+              <p class="text-zinc-400 text-xs mt-1">สร้างซองของขวัญในแอป TrueMoney ตามยอดที่กำหนด</p>
+            </div>
+
+            <div class="w-full mb-4">
+              <label class="block text-xs font-bold text-zinc-400 mb-2">ลิงก์ซองของขวัญ (Gift Voucher Link):</label>
+              <input 
+                id="voucher-url-input" 
+                type="url" 
+                placeholder="https://gift.truemoney.com/campaign/..." 
+                class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-amber-500"
+              />
+            </div>
+
+            <div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 text-xs text-amber-400/90 mb-6 text-left leading-relaxed">
+              💡 <strong>วิธีทำ:</strong> เข้าแอป TrueMoney &gt; โอนเงิน &gt; ส่งซองของขวัญ &gt; ใส่ยอด <strong id="voucher-exact-amount">฿0.00</strong> (แบ่ง 1 คน) แล้วนำลิงก์มาวาง
+            </div>
+
+            <button onclick="simulateVoucherPayment()" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3.5 rounded-2xl transition-all shadow-lg text-sm active:scale-95">
+              ยืนยันและรับไอดีทันที
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW 3: ORDER SUCCESS / INSTANT FULFILLED SCREEN -->
+  <div id="view-success" class="hidden min-h-[85vh] py-16 flex-col items-center justify-center text-center">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 w-full">
+      
+      <!-- Green Success Icon -->
+      <div class="w-20 h-20 bg-emerald-500/20 text-emerald-400 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-emerald-500/30 shadow-[0_0_40px_rgba(16,185,129,0.3)]">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      
+      <h1 class="text-3xl md:text-5xl font-heading font-black text-white mb-2 uppercase tracking-tight">
+        ORDER FULFILLED!
+      </h1>
+      <p class="text-zinc-400 text-sm md:text-base mb-8 max-w-lg mx-auto">
+        ชำระเงินสำเร็จ ระบบได้จัดสรรและส่งมอบไอดีให้คุณเรียบร้อยแล้ว
+      </p>
+
+      <!-- Secure Account Credentials Delivery Card -->
+      <div class="w-full bg-zinc-950 border border-white/10 p-6 md:p-10 rounded-3xl relative overflow-hidden shadow-2xl text-left">
+        <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-amber-500 via-yellow-300 to-emerald-400"></div>
+        
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6 pb-6 border-b border-white/5">
+          <div>
+            <span id="success-order-id" class="text-[11px] font-mono text-zinc-500 block mb-1">
+              ORDER ID: #ORD-AB882910
+            </span>
+            <h3 id="success-product-name" class="text-lg font-bold text-white">แพ็กเกจไอดีของคุณ</h3>
+          </div>
+          <div class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> สถานะ: ส่งมอบสำเร็จ
+          </div>
+        </div>
+
+        <!-- Hidden Credentials Box -->
+        <div class="bg-[#050505] border border-white/10 rounded-2xl p-5 md:p-6 mb-6 relative group">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs text-zinc-500 font-bold uppercase tracking-widest">ข้อมูลบัญชีเกม (LOGIN CREDENTIALS)</span>
+            <button onclick="togglePasswordVisibility()" class="text-xs text-zinc-400 hover:text-white flex items-center gap-1">
+              <span id="pw-toggle-label">แสดงรหัส</span>
+            </button>
+          </div>
+
+          <div class="space-y-2 font-mono text-sm sm:text-base">
+            <div class="flex items-center gap-2 bg-zinc-900/60 p-3 rounded-xl border border-white/5">
+              <span class="text-zinc-500 text-xs w-20">USERNAME:</span>
+              <span id="acc-username" class="text-amber-400 font-bold select-all">ArenaAgent9910</span>
+            </div>
+            <div class="flex items-center gap-2 bg-zinc-900/60 p-3 rounded-xl border border-white/5">
+              <span class="text-zinc-500 text-xs w-20">PASSWORD:</span>
+              <span id="acc-password" class="text-amber-400 font-bold select-all">••••••••••••••••</span>
+            </div>
+          </div>
+
+          <button onclick="copyCredentials()" class="mt-4 w-full bg-zinc-900 hover:bg-amber-500 hover:text-black border border-white/10 text-white py-3 rounded-xl transition-all font-bold text-xs flex items-center justify-center gap-2 active:scale-98">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+            <span id="copy-btn-text">คัดลอก Username &amp; Password ทั้งหมด</span>
+          </button>
+        </div>
+
+        <!-- Security Recommendations -->
+        <div class="space-y-2 bg-amber-500/5 border border-amber-500/20 p-4 rounded-2xl text-xs text-zinc-400">
+          <div class="flex items-center gap-2 text-amber-500 font-bold">
+            <span>🛡️</span> ข้อแนะนำความปลอดภัยหลังรับไอดี:
+          </div>
+          <ul class="list-disc list-inside space-y-1 text-zinc-400">
+            <li>กรุณาเข้าสู่ระบบเกมและเปลี่ยนรหัสผ่านทันที</li>
+            <li>ผูกอีเมลส่วนตัวหรือเปิดใช้งาน 2FA เพื่อสิทธิ์ขาดในการครอบครอง</li>
+            <li>ข้อมูลออเดอร์นี้ถูกบันทึกไว้ในเมนู <strong>"ออเดอร์ของฉัน"</strong> สามารถเปิดดูย้อนหลังได้ตลอดเวลา</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-8 flex justify-center gap-4">
+        <button onclick="navigateTo('store')" class="bg-white hover:bg-amber-500 text-black font-bold px-8 py-3.5 rounded-full transition-all text-xs uppercase tracking-wider shadow-lg active:scale-95 font-heading">
+          กลับสู่หน้าร้านค้า
+        </button>
+        <button onclick="openMyOrdersModal()" class="bg-zinc-900 hover:bg-zinc-800 text-white border border-white/10 font-bold px-6 py-3.5 rounded-full transition-all text-xs">
+          ดูประวัติออเดอร์ทั้งหมด
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Product Detail Modal (WITH MULTI-IMAGE GALLERY VIEWER LIKE MOSZXLLSHOP) -->
+  <div id="product-detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+    <div class="bg-zinc-950 border border-white/10 rounded-3xl max-w-xl w-full p-6 sm:p-8 relative max-h-[92vh] overflow-y-auto shadow-2xl">
+      <button onclick="closeDetailModal()" class="absolute top-5 right-5 text-zinc-400 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <!-- Multi-Image Main Viewer -->
+      <div class="aspect-video w-full rounded-2xl overflow-hidden mb-3 border border-white/10 bg-zinc-900 relative group">
+        <img id="modal-img" src="" alt="Detail" class="w-full h-full object-cover transition-transform duration-500">
+        <div id="modal-img-counter" class="absolute bottom-2 right-2 bg-black/80 backdrop-blur-md px-2.5 py-1 rounded text-[10px] font-mono text-zinc-300">
+          ภาพ 1 / 1
+        </div>
+      </div>
+
+      <!-- Gallery Thumbnail Switcher Strip -->
+      <div id="modal-gallery-strip" class="flex gap-2 mb-4 overflow-x-auto pb-1">
+        <!-- Rendered via JS -->
+      </div>
+
+      <div class="flex items-center gap-2 mb-2">
+        <div id="modal-koen" class="inline-block bg-amber-500/10 text-amber-500 text-xs font-bold px-3 py-1 rounded-full border border-amber-500/20">
+          Koen Value: -
+        </div>
+        <div id="modal-stock-badge" class="inline-block bg-emerald-500/10 text-emerald-400 text-xs font-bold px-3 py-1 rounded-full border border-emerald-500/20">
+          พร้อมส่ง
+        </div>
+      </div>
+
+      <h3 id="modal-title" class="text-xl font-bold text-white mb-2">-</h3>
+      <p id="modal-desc" class="text-zinc-400 text-xs leading-relaxed mb-6">-</p>
+
+      <div class="bg-zinc-900/60 border border-white/5 p-4 rounded-2xl mb-6">
+        <h4 class="text-xs font-bold text-white uppercase tracking-wider mb-3">อุปกรณ์และสิ่งที่จะได้รับในไอดี:</h4>
+        <div id="modal-specs" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-zinc-300">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-4 border-t border-white/5">
+        <div>
+          <span class="text-[10px] text-zinc-500 uppercase font-bold block">ราคาจำหน่าย</span>
+          <span id="modal-price" class="text-2xl font-heading font-black text-amber-500">฿0.00</span>
+        </div>
+        <button id="modal-buy-btn" class="px-6 py-3 rounded-full font-bold text-xs uppercase transition-all bg-amber-500 hover:bg-white text-black shadow-lg hover:scale-105 active:scale-95">
+          สั่งซื้อทันที
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: MY ORDERS MODAL (CUSTOMER ORDER HISTORY) -->
+  <div id="my-orders-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+    <div class="bg-zinc-950 border border-white/10 rounded-3xl max-w-2xl w-full p-6 sm:p-8 relative max-h-[90vh] overflow-y-auto shadow-2xl">
+      <button onclick="closeMyOrdersModal()" class="absolute top-5 right-5 text-zinc-400 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-amber-500 text-xs font-mono font-bold uppercase tracking-widest">ORDER HISTORY</span>
+      </div>
+      <h3 class="text-2xl font-heading font-black text-white uppercase mb-2">
+        ประวัติคำสั่งซื้อของฉัน
+      </h3>
+      <p class="text-zinc-500 text-xs mb-6">
+        ไอดีเกมที่คุณเคยสั่งซื้อจะถูกบันทึกไว้ที่นี่ สามารถคลิกเพื่อดูรหัสผ่านหรือคัดลอกได้ตลอดเวลา
+      </p>
+
+      <div id="my-orders-list" class="space-y-4">
+        <!-- Rendered via JS -->
+      </div>
+
+      <div id="my-orders-empty" class="hidden py-12 text-center flex-col items-center justify-center">
+        <div class="text-4xl mb-2">📦</div>
+        <div class="text-white font-bold text-sm mb-1">ยังไม่มีประวัติคำสั่งซื้อ</div>
+        <div class="text-zinc-500 text-xs">เมื่อคุณสั่งซื้อไอดี ข้อมูลจะมาปรากฏที่นี่โดยอัตโนมัติ</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Quick Navigation Bar -->
+  <div class="md:hidden fixed bottom-0 left-0 right-0 bg-[#050505]/95 backdrop-blur-xl border-t border-white/10 z-40 pb-safe">
+    <div class="flex items-center justify-around py-3 px-2">
+            <button onclick="navigateTo('store')" class="flex flex-col items-center gap-1 text-[10px] font-bold text-amber-500">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <span>หน้าแรก</span>
+      </button>
+      
+      <!-- สินค้า สำหรับมือถือ -->
+      <a href="front/category.html" class="flex flex-col items-center gap-1 text-[10px] font-bold text-zinc-500 hover:text-amber-400">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <span>สินค้า</span>
+      </a>
+
+      <!-- ตะกร้า สำหรับมือถือ -->
+      <button onclick="openCartDrawer()" class="flex flex-col items-center gap-1 text-[10px] font-bold text-zinc-500 hover:text-white relative">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        <span>ตะกร้า</span>
+      </button>
+
+      <!-- ส่งขายไอดี สำหรับมือถือ -->
+      <button onclick="openSellAccountModal()" class="flex flex-col items-center gap-1 text-[10px] font-bold text-amber-500">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>ส่งขาย</span>
+      </button>
+
+      <button onclick="openMyOrdersModal()" class="flex flex-col items-center gap-1 text-[10px] font-bold text-zinc-500 hover:text-white relative">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        <span>ออเดอร์</span>
+      </button>
+      
+      <a href="front/account.html" class="flex flex-col items-center gap-1 text-[10px] font-bold text-zinc-500 hover:text-amber-400">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        <span id="mobile-nav-auth-text">บัญชี</span>
+      </a>
+    </div>
+  </div>
+
+  <script type="module" src="js/index.js"></script>
+
+  <!-- MODAL: SHOPPING CART DRAWER (ตะกร้าสินค้า) -->
+  <div id="cart-drawer-modal" class="fixed inset-0 z-50 hidden items-center justify-end bg-black/80 backdrop-blur-sm">
+    <div class="bg-zinc-950 border-l border-white/10 w-full max-w-md h-full p-6 flex flex-col justify-between shadow-2xl relative">
+      <div>
+        <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="text-xl font-heading font-black text-white uppercase">ตะกร้าสินค้า</span>
+            <span id="cart-drawer-count" class="bg-amber-500 text-black text-xs font-bold px-2 py-0.5 rounded-full">0 รายการ</span>
+          </div>
+          <button onclick="closeCartDrawer()" class="text-zinc-400 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors">
+            ✕
+          </button>
+        </div>
+
+        <div id="cart-drawer-items" class="space-y-3 overflow-y-auto max-h-[calc(100vh-280px)] pr-1">
+          <!-- Rendered via JS -->
+        </div>
+
+        <div id="cart-drawer-empty" class="py-16 text-center text-zinc-500">
+          <div class="text-4xl mb-2">🛒</div>
+          <div class="text-white font-bold text-sm mb-1">ตะกร้าสินค้าว่างเปล่า</div>
+          <div class="text-xs">เลือกไอดีที่ต้องการเพื่อเพิ่มลงในตะกร้า</div>
+        </div>
+      </div>
+
+      <div class="pt-4 border-t border-white/10 space-y-3 bg-zinc-950">
+        <div class="flex justify-between items-center text-xs text-zinc-400">
+          <span>ยอดรวมสินค้า:</span>
+          <span id="cart-subtotal-price" class="text-white font-bold font-mono text-sm">฿0.00</span>
+        </div>
+        <div class="flex justify-between items-center text-sm font-bold text-white">
+          <span>ยอดชำระสุทธิ:</span>
+          <span id="cart-grandtotal-price" class="text-amber-500 font-heading font-black text-xl">฿0.00</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button onclick="clearCart()" class="bg-zinc-900 hover:bg-zinc-800 text-zinc-400 border border-white/10 py-3 rounded-xl text-xs font-bold transition-all">
+            ล้างตะกร้า
+          </button>
+          <button onclick="checkoutCart()" class="bg-amber-500 hover:bg-amber-400 text-black py-3 rounded-xl text-xs font-bold transition-all font-heading uppercase shadow-md">
+            สั่งซื้อทันที →
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ORDER TRACKING BY ID (ค้นหาและติดตามสถานะออเดอร์) -->
+  <div id="order-tracking-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+    <div class="bg-zinc-950 border border-white/10 rounded-3xl max-w-xl w-full p-6 sm:p-8 relative my-8 shadow-2xl">
+      <button onclick="closeOrderTrackingModal()" class="absolute top-5 right-5 text-zinc-400 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors">
+        ✕
+      </button>
+
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-amber-500 text-xs font-mono font-bold uppercase tracking-widest">ORDER TRACKER</span>
+      </div>
+      <h3 class="text-2xl font-heading font-black text-white uppercase mb-2">
+        ตรวจสอบคำสั่งซื้อ
+      </h3>
+      <p class="text-zinc-400 text-xs mb-6">
+        กรอกหมายเลขคำสั่งซื้อ (เช่น ORD-AB123456) หรืออีเมล เพื่อดึงข้อมูลไอดีและรหัสผ่านเกมของคุณ
+      </p>
+
+      <div class="flex gap-2 mb-6">
+        <input 
+          id="order-track-input" 
+          type="text" 
+          placeholder="กรอกเลขออเดอร์ (ORD-ABxxxxxx)..." 
+          class="flex-grow bg-zinc-900 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+          onkeydown="if(event.key === 'Enter') handleOrderTrackSearch()"
+        />
+        <button onclick="handleOrderTrackSearch()" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-5 py-3 rounded-xl text-xs shrink-0 transition-all font-heading">
+          ค้นหา
+        </button>
+      </div>
+
+      <div id="order-track-result" class="hidden">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SELL ACCOUNT SUBMISSION (ส่งขายไอดีไก่ให้ร้าน) -->
+  <div id="sell-account-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+    <div class="bg-zinc-950 border border-amber-500/30 rounded-3xl max-w-xl w-full p-6 sm:p-8 relative my-8 shadow-2xl">
+      <button onclick="closeSellAccountModal()" class="absolute top-5 right-5 text-zinc-400 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors">
+        ✕
+      </button>
+
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-amber-500 text-xs font-mono font-bold uppercase tracking-widest">SELL ACCOUNT TO SHOP</span>
+      </div>
+      <h3 class="text-2xl font-heading font-black text-white uppercase mb-2">
+        ส่งขายไอดีไก่ / บัญชีเกมให้ร้าน
+      </h3>
+      <p class="text-zinc-400 text-xs mb-6 leading-relaxed">
+        ร้าน MOSZXLL SHOP รับซื้อไอดีไก่ 61, ไก่เงิน 10M - 100M และไอดีพร้อมเล่นไม่อั้น มีส่งประจำได้ตลอด โอนไว จ่ายจริง
+      </p>
+
+      <form onsubmit="handleSellAccountSubmit(event)" class="space-y-4">
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-zinc-400 mb-1.5">ประเภทไอดีที่ต้องการขาย:</label>
+            <select id="sell-acc-type" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500" required>
+              <option value="ไก่ 61 กระสุน (Ammo Starter)">ไก่ 61 กระสุน (Ammo Starter)</option>
+              <option value="ไก่เงิน 10M - 30M Koen">ไก่เงิน 10M - 30M Koen</option>
+              <option value="ไก่เงิน 40M - 60M Koen">ไก่เงิน 40M - 60M Koen</option>
+              <option value="ไก่เงิน 70M - 100M Koen">ไก่เงิน 70M - 100M Koen</option>
+              <option value="ไอดีฟูลสกิน / สกินแรร์">ไอดีฟูลสกิน / สกินแรร์</option>
+              <option value="บริการโยกเงิน M">บริการโยกเงิน M</option>
+              <option value="อื่นๆ">อื่นๆ</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-zinc-400 mb-1.5">จำนวนไอดีที่ส่ง (ตัว):</label>
+            <input id="sell-acc-qty" type="number" min="1" value="1" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500" required />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-zinc-400 mb-1.5">ราคาเสนอขายรวม (บาท):</label>
+            <input id="sell-acc-price" type="number" min="10" placeholder="เช่น 200" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500" required />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-zinc-400 mb-1.5">เบอร์พร้อมเพย์ / บัญชีรับเงิน:</label>
+            <input id="sell-acc-payout" type="text" placeholder="089xxxxxxx หรือ เลขบัญชี" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500" required />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-zinc-400 mb-1.5">ชื่อบัญชีผู้รับเงิน:</label>
+            <input id="sell-acc-name" type="text" placeholder="ชื่อ-นามสกุล" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500" required />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-zinc-400 mb-1.5">ช่องทางติดต่อกลับ (Facebook/Discord/Line):</label>
+            <input id="sell-acc-contact" type="text" placeholder="เช่น Facebook Link หรือ Discord ID" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500" required />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-400 mb-1.5">
+            ข้อมูลไอดีและรหัสผ่าน (1 บรรทัด = 1 ไอดี, หรือวางรายละเอียด):
+          </label>
+          <textarea 
+            id="sell-acc-creds" 
+            rows="4" 
+            placeholder="เช่น:&#10;account01|password123&#10;account02|password456" 
+            class="w-full bg-zinc-900 border border-white/10 rounded-2xl p-3.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500"
+            required
+          ></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-400 mb-1.5">หมายเหตุเพิ่มเติม (ถ้ามี):</label>
+          <input id="sell-acc-notes" type="text" placeholder="เช่น ทำเควสจบแล้ว / เลเวล 12 ครบ" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-amber-500" />
+        </div>
+
+        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3.5 rounded-xl transition-all shadow-lg text-xs uppercase tracking-wider font-heading active:scale-95">
+          🚀 ยืนยันส่งรายการเสนอขาย (SUBMIT PROPOSAL)
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD CUSTOMER REVIEW -->
+  <div id="add-review-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+    <div class="bg-zinc-950 border border-white/10 rounded-3xl max-w-md w-full p-6 sm:p-8 relative my-8 shadow-2xl">
+      <button onclick="closeReviewModal()" class="absolute top-5 right-5 text-zinc-400 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors">
+        ✕
+      </button>
+
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-amber-500 text-xs font-mono font-bold uppercase tracking-widest">CUSTOMER REVIEW</span>
+      </div>
+      <h3 class="text-2xl font-heading font-black text-white uppercase mb-2">
+        เขียนรีวิวร้านค้า
+      </h3>
+      <p class="text-zinc-400 text-xs mb-5">
+        แบ่งปันประสบการณ์การสั่งซื้อไอดีกับเพื่อน ๆ ผู้เล่น Arena Breakout
+      </p>
+
+      <form onsubmit="handleReviewSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-zinc-400 mb-1.5">ให้คะแนนร้านค้า:</label>
+          <select id="review-rating" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-amber-400 font-bold focus:outline-none focus:border-amber-500">
+            <option value="5">⭐⭐⭐⭐⭐ 5 ดาว (ยอดเยี่ยมมาก)</option>
+            <option value="4">⭐⭐⭐⭐ 4 ดาว (ดีมาก)</option>
+            <option value="3">⭐⭐⭐ 3 ดาว (ปานกลาง)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-400 mb-1.5">ชื่อของคุณ / ฉายาในเกม:</label>
+          <input id="review-author" type="text" placeholder="เช่น Agent_Ghost" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500" required />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-400 mb-1.5">สินค้าที่ซื้อ (ถ้ามี):</label>
+          <input id="review-product" type="text" placeholder="เช่น M4A1 T6 หรือ ไก่เงิน 15M" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-400 mb-1.5">ความคิดเห็น / รีวิว:</label>
+          <textarea id="review-text" rows="3" placeholder="เขียนความประทับใจของคุณ..." class="w-full bg-zinc-900 border border-white/10 rounded-2xl p-3 text-xs text-white focus:outline-none focus:border-amber-500" required></textarea>
+        </div>
+
+        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3 rounded-xl transition-all shadow-md text-xs uppercase tracking-wider font-heading">
+          ส่งรีวิว (SUBMIT REVIEW)
+        </button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

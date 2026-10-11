@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เข้าสู่ระบบ & สมัครสมาชิก — TACTICAL STORE</title>
+  
+  <!-- Google Fonts: Outfit & Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Prompt', 'sans-serif'],
+            heading: ['Outfit', 'Prompt', 'sans-serif'],
+            body: ['Prompt', 'sans-serif']
+          },
+          colors: {
+            tactical: {
+              black: '#050505',
+              card: '#0c0c0e',
+              amber: '#f59e0b',
+              amberHover: '#d97706',
+              border: 'rgba(255, 255, 255, 0.08)',
+              glow: 'rgba(245, 158, 11, 0.15)'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- เชื่อมโยง CSS จากโฟลเดอร์ css/style.css -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    svg {
+      max-width: 100%;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body class="selection:bg-amber-500/30 selection:text-white min-h-screen bg-[#050505] tactical-grid-bg relative flex flex-col justify-between overflow-x-hidden">
+
+  <!-- Toast Notification Wrapper -->
+  <div id="toast-box" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 -translate-y-4 scale-95 hidden items-center gap-3 bg-zinc-900 border border-amber-500/50 text-white px-5 py-3 rounded-2xl shadow-2xl backdrop-blur-xl">
+    <svg width="20" height="20" class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+    </svg>
+    <span id="toast-text" class="text-xs md:text-sm font-medium">ข้อความแจ้งเตือน</span>
+  </div>
+
+  <!-- Background Ambient Glow -->
+  <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-amber-500/10 rounded-full blur-[140px] pointer-events-none"></div>
+
+  <!-- Header Nav -->
+  <header class="w-full border-b border-white/5 bg-[#050505]/80 backdrop-blur-xl relative z-20">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="../index.html" class="flex items-center gap-3 group">
+        <div class="w-9 h-9 bg-amber-500 text-black flex items-center justify-center rounded-xl font-black text-xl shadow-[0_0_15px_rgba(245,158,11,0.4)] group-hover:scale-105 transition-transform">
+          <svg width="20" height="20" class="w-5 h-5 stroke-black fill-none" stroke="black" fill="none" stroke-width="2.5" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xl font-heading font-black text-white tracking-wider uppercase leading-none">
+            TACTICAL<span class="text-amber-500">STORE</span>
+          </span>
+          <span class="text-[9px] text-zinc-500 tracking-widest uppercase">Arena Breakout Market</span>
+        </div>
+      </a>
+
+      <a href="../index.html" class="inline-flex items-center gap-2 text-xs font-bold text-zinc-400 hover:text-white bg-zinc-900/80 hover:bg-zinc-800 border border-white/10 px-4 py-2 rounded-full transition-all">
+        <svg width="16" height="16" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        กลับหน้าร้านค้า
+      </a>
+    </div>
+  </header>
+
+  <!-- Auth Main Card -->
+  <main class="flex-1 flex items-center justify-center px-4 py-12 relative z-10">
+    <div class="w-full max-w-md">
+      
+      <!-- Tactical Security Badge -->
+      <div class="flex items-center justify-center gap-2 text-amber-500 text-[11px] font-mono uppercase tracking-widest mb-4 bg-amber-500/10 border border-amber-500/20 py-1.5 px-4 rounded-full w-fit mx-auto backdrop-blur-md">
+        <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+        <span>SECURE AUTH GATEWAY v2.6</span>
+      </div>
+
+      <!-- Auth Glass Card -->
+      <div class="glass-card rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+        <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
+
+        <!-- Mode Tabs -->
+        <div class="grid grid-cols-2 gap-1 bg-zinc-900/90 p-1 rounded-2xl border border-white/10 mb-7">
+          <button 
+            id="tab-btn-login" 
+            onclick="switchAuthMode('login')"
+            class="py-2.5 rounded-xl font-bold text-xs transition-all duration-300 flex items-center justify-center gap-2 bg-amber-500 text-black shadow-lg">
+            <svg width="16" height="16" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+            </svg>
+            เข้าสู่ระบบ
+          </button>
+          <button 
+            id="tab-btn-register" 
+            onclick="switchAuthMode('register')"
+            class="py-2.5 rounded-xl font-bold text-xs transition-all duration-300 flex items-center justify-center gap-2 text-zinc-400 hover:text-white">
+            <svg width="16" height="16" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+            </svg>
+            สมัครสมาชิก
+          </button>
+        </div>
+
+        <!-- 1. ฟอร์มเข้าสู่ระบบ (LOGIN WITH USERNAME) -->
+        <form id="form-login" onsubmit="handleLoginSubmit(event)" class="space-y-4">
+          <div class="text-left mb-5">
+            <h1 class="text-xl sm:text-2xl font-heading font-black text-white uppercase tracking-tight">เข้าสู่ระบบคลังไอดี</h1>
+            <p class="text-zinc-500 text-xs mt-1">ยินดีต้อนรับกลับสู่ฐานทัพ ใส่ชื่อผู้ใช้งานเพื่อเข้าจัดการออเดอร์</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">ชื่อผู้ใช้งาน (USERNAME)</label>
+            <div class="relative">
+              <input 
+                id="login-username" 
+                type="text" 
+                required 
+                placeholder="เช่น TacticalAgent99"
+                class="tactical-input w-full rounded-xl px-4 py-3 pl-10 text-xs text-white placeholder-zinc-600 focus:text-white"
+                autocomplete="username"
+              />
+              <svg width="16" height="16" class="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+              </svg>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label class="text-xs font-bold text-zinc-400 uppercase tracking-wider">รหัสผ่าน (PASSWORD)</label>
+              <a href="javascript:void(0)" onclick="triggerToast('หากลืมรหัสผ่าน กรุณาติดต่อแอดมินทาง Line ID: @tacticalstore')" class="text-[11px] text-amber-500 hover:underline font-medium">ลืมรหัสผ่าน?</a>
+            </div>
+            <div class="relative">
+              <input 
+                id="login-password" 
+                type="password" 
+                required 
+                placeholder="••••••••••••"
+                class="tactical-input w-full rounded-xl px-4 py-3 pl-10 pr-10 text-xs text-white placeholder-zinc-600"
+                autocomplete="current-password"
+              />
+              <svg width="16" height="16" class="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+              <button type="button" onclick="togglePasswordInput('login-password', this)" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300">
+                <svg width="16" height="16" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 pt-1">
+            <input type="checkbox" id="remember-me" class="w-4 h-4 rounded bg-zinc-900 border-white/20 text-amber-500 focus:ring-0">
+            <label for="remember-me" class="text-xs text-zinc-400 cursor-pointer">จดจำการเข้าสู่ระบบบนอุปกรณ์นี้</label>
+          </div>
+
+          <button 
+            type="submit" 
+            id="btn-login-submit"
+            class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3.5 rounded-xl transition-all shadow-[0_0_20px_rgba(245,158,11,0.3)] text-xs uppercase tracking-wider hover:scale-[1.02] active:scale-[0.98] mt-2 flex items-center justify-center gap-2">
+            <span>ยืนยันเข้าสู่ระบบ (ACCESS PORTAL)</span>
+            <svg width="16" height="16" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+        </form>
+
+        <!-- 2. ฟอร์มสมัครสมาชิก (REGISTER WITH USERNAME & PASSWORD) -->
+        <form id="form-register" onsubmit="handleRegisterSubmit(event)" class="space-y-4 hidden">
+          <div class="text-left mb-5">
+            <h1 class="text-xl sm:text-2xl font-heading font-black text-white uppercase tracking-tight">ลงทะเบียนสมาชิกใหม่</h1>
+            <p class="text-zinc-500 text-xs mt-1">สร้างบัญชีด้วย Username และรหัสผ่านเพื่อบันทึกประวัติการซื้อ</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">ชื่อผู้ใช้งาน (USERNAME)</label>
+            <div class="relative">
+              <input 
+                id="register-username" 
+                type="text" 
+                required 
+                placeholder="ตั้งชื่อผู้ใช้ (3-24 ตัวอักษร)"
+                class="tactical-input w-full rounded-xl px-4 py-3 pl-10 text-xs text-white placeholder-zinc-600"
+                autocomplete="username"
+              />
+              <svg width="16" height="16" class="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+              </svg>
+            </div>
+            <span class="text-[10px] text-zinc-500 mt-1 block">รองรับทั้งภาษาไทยและอังกฤษ ความยาว 3-24 ตัวอักษร</span>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">รหัสผ่าน (PASSWORD)</label>
+            <div class="relative">
+              <input 
+                id="register-password" 
+                type="password" 
+                required 
+                minlength="6"
+                placeholder="ตั้งรหัสผ่านอย่างน้อย 6 ตัวอักษร"
+                class="tactical-input w-full rounded-xl px-4 py-3 pl-10 pr-10 text-xs text-white placeholder-zinc-600"
+                autocomplete="new-password"
+              />
+              <svg width="16" height="16" class="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+              <button type="button" onclick="togglePasswordInput('register-password', this)" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300">
+                <svg width="16" height="16" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">ยืนยันรหัสผ่าน (CONFIRM PASSWORD)</label>
+            <div class="relative">
+              <input 
+                id="register-confirm-password" 
+                type="password" 
+                required 
+                minlength="6"
+                placeholder="กรอกรหัสผ่านซ้ำอีกครั้ง"
+                class="tactical-input w-full rounded-xl px-4 py-3 pl-10 pr-10 text-xs text-white placeholder-zinc-600"
+                autocomplete="new-password"
+              />
+              <svg width="16" height="16" class="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-2 pt-1 text-left">
+            <input type="checkbox" id="accept-terms" required class="w-4 h-4 mt-0.5 rounded bg-zinc-900 border-white/20 text-amber-500 focus:ring-0">
+            <label for="accept-terms" class="text-[11px] text-zinc-400 leading-tight">
+              ฉันยอมรับ <span class="text-amber-500 hover:underline">ข้อกำหนดการใช้งาน</span> และนโยบายความเป็นส่วนตัวของร้านค้า
+            </label>
+          </div>
+
+          <button 
+            type="submit" 
+            id="btn-register-submit"
+            class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3.5 rounded-xl transition-all shadow-[0_0_20px_rgba(245,158,11,0.3)] text-xs uppercase tracking-wider hover:scale-[1.02] active:scale-[0.98] mt-2 flex items-center justify-center gap-2">
+            <span>สร้างบัญชีผู้ใช้งาน (CREATE ACCOUNT)</span>
+            <svg width="16" height="16" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          </button>
+        </form>
+
+        <!-- Social Connect Buttons -->
+        <div class="my-6 flex items-center gap-4">
+          <div class="h-px bg-white/10 flex-1"></div>
+          <span class="text-[10px] text-zinc-500 font-mono uppercase tracking-wider">หรือเชื่อมต่อด้วย</span>
+          <div class="h-px bg-white/10 flex-1"></div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="triggerToast('ระบบล็อกอิน Google เตรียมเปิดใช้งานเร็วๆ นี้')" class="flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 border border-white/10 text-white py-2.5 px-4 rounded-xl text-xs font-semibold transition-all">
+            <svg width="16" height="16" class="w-4 h-4" viewBox="0 0 24 24">
+              <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"/>
+              <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
+              <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3 0-.8.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12.3 0 15s.7 5.3 1.9 7.7l3.7-2.9z"/>
+              <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16c1.8 3.7 5.6 7 10.1 7z"/>
+            </svg>
+            <span>Google</span>
+          </button>
+          
+          <button onclick="triggerToast('ระบบล็อกอิน Discord เตรียมเปิดใช้งานเร็วๆ นี้')" class="flex items-center justify-center gap-2 bg-[#5865F2]/10 hover:bg-[#5865F2]/20 border border-[#5865F2]/30 text-[#7983F5] py-2.5 px-4 rounded-xl text-xs font-semibold transition-all">
+            <svg width="16" height="16" class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+              <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028z"/>
+            </svg>
+            <span>Discord</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="w-full border-t border-white/5 py-6 text-center text-zinc-600 text-xs">
+    <span>© 2026 Tactical Store — ระบบความปลอดภัยป้องกันบัญชีเกม Arena Breakout</span>
+  </footer>
+
+  <script type="module" src="../js/login.js"></script>
+</body>
+</html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>สินค้าทั้งหมด — TACTICAL STORE</title>
+  
+  <!-- Google Fonts: Outfit & Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Prompt', 'sans-serif'],
+            body: ['Prompt', 'sans-serif'],
+            heading: ['Outfit', 'Prompt', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Courier New', 'monospace']
+          },
+          colors: {
+            tactical: {
+              black: '#050505',
+              card: '#0c0c0e',
+              amber: '#f59e0b',
+              amberHover: '#d97706',
+              border: 'rgba(255, 255, 255, 0.08)',
+              glow: 'rgba(245, 158, 11, 0.15)'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    * {
+      font-family: 'Prompt', sans-serif;
+    }
+    h1, h2, h3, h4, h5, h6, .font-heading {
+      font-family: 'Outfit', 'Prompt', sans-serif !important;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+    }
+    .glass-card {
+      background: linear-gradient(180deg, rgba(18, 18, 22, 0.85) 0%, rgba(10, 10, 12, 0.95) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+    }
+    .glass-card:hover {
+      border-color: rgba(245, 158, 11, 0.45);
+    }
+    /* ซ่อน Scrollbar ของหมวดหมู่แนวนอน */
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="selection:bg-amber-500/30 selection:text-white pb-24 md:pb-12 bg-[#050505] tactical-grid-bg text-zinc-300 min-h-screen">
+
+  <!-- Toast Notification -->
+  <div id="toast-box" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 -translate-y-4 scale-95 flex items-center gap-3 bg-zinc-900 border border-amber-500/50 text-white px-5 py-3 rounded-2xl shadow-2xl backdrop-blur-xl">
+    <svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+    </svg>
+    <span id="toast-text" class="text-xs md:text-sm font-medium">ข้อความแจ้งเตือน</span>
+  </div>
+
+  <!-- Top Marquee Announcement -->
+  <div class="bg-amber-500 text-black text-xs font-bold py-2 overflow-hidden border-b border-amber-600 shadow-md">
+    <div class="animate-marquee-track">
+      <span class="mx-4 flex items-center gap-1.5 font-bold">
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        ⚡ หมวดหมู่สินค้า ARENA BREAKOUT • ไก่กระสุน T5-T6 • ไก่เงิน KOEN • บริการโยกเงิน M ปลอดภัย 100%
+      </span>
+      <span class="mx-4 text-black/50">•</span>
+      <span class="mx-4 font-bold">🛡️ จัดส่งอัตโนมัติ รวดเร็ว ได้รับข้อมูลไอดีทันทีหลังชำระเงิน</span>
+    </div>
+  </div>
+
+  <!-- Main Navigation Bar -->
+  <nav class="sticky top-0 z-40 border-b border-white/5 bg-[#050505]/90 backdrop-blur-2xl">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 h-16 flex justify-between items-center">
+      
+      <!-- Brand Logo -->
+      <a href="../index.html" class="flex items-center gap-3 group">
+        <div class="w-9 h-9 bg-amber-500 text-black flex items-center justify-center rounded-xl font-black text-xl shadow-[0_0_15px_rgba(245,158,11,0.4)] group-hover:scale-105 transition-transform">
+          <svg class="w-5 h-5 group-hover:rotate-90 transition-transform duration-500 stroke-black fill-none" stroke-width="2.5" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xl font-heading font-black text-white tracking-wider uppercase leading-none">
+            TACTICAL<span class="text-amber-500">STORE</span>
+          </span>
+          <span class="text-[10px] text-zinc-500 tracking-widest uppercase font-mono">ค้นหาสินค้าทั้งหมด</span>
+        </div>
+      </a>
+
+      <!-- Desktop Links -->
+      <div class="hidden md:flex items-center gap-5 text-sm font-semibold">
+        <a href="../index.html" class="text-zinc-400 hover:text-white transition-colors">หน้าแรก</a>
+        <a href="category.html" class="text-amber-400 font-bold flex items-center gap-1.5 transition-colors">
+          <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          <span>สินค้าทั้งหมด</span>
+        </a>
+        <a href="../index.html" class="text-zinc-400 hover:text-amber-400 transition-colors flex items-center gap-1 text-xs">
+          <span>🔍</span>
+          <span>ค้นหาออเดอร์</span>
+        </a>
+        <a href="../index.html" class="text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 text-xs font-bold">
+          <span>💰</span>
+          <span>ส่งขายไอดี</span>
+        </a>
+        <a href="account.html" class="text-zinc-400 hover:text-amber-400 transition-colors flex items-center gap-1.5 text-xs bg-zinc-900/80 px-3.5 py-1.5 rounded-full border border-white/5 hover:border-amber-500/40">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          <span>หมวดหมู่บัญชี</span>
+        </a>
+      </div>
+
+      <!-- Action Area -->
+      <div class="flex items-center gap-3">
+        <a href="../index.html" class="text-xs font-bold text-zinc-400 hover:text-white bg-zinc-900 border border-white/10 px-4 py-2 rounded-full transition-all flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          <span>กลับหน้าร้านค้า</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Container (Moszxllshop search style) -->
+  <main class="max-w-[1400px] mx-auto px-4 sm:px-6 py-10 space-y-8">
+
+    <!-- Header & Search Area -->
+    <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+      <h1 class="text-3xl font-heading font-black text-white uppercase tracking-tight flex items-center gap-3">
+        <div class="w-10 h-10 bg-amber-500/20 text-amber-500 rounded-xl flex items-center justify-center border border-amber-500/30">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+        <span>สินค้าทั้งหมด</span>
+      </h1>
+      
+      <div class="flex items-center gap-3 w-full md:w-auto">
+        <!-- Search Box -->
+        <div class="relative w-full md:w-80">
+          <input 
+            id="cat-prod-search" 
+            type="text" 
+            placeholder="ค้นหาชื่อสินค้า..." 
+            oninput="searchCategoryProducts(this.value)"
+            class="w-full bg-zinc-900 border border-white/10 rounded-2xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors"
+          />
+          <svg class="w-4 h-4 text-zinc-500 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+        
+        <!-- Desktop Sort -->
+        <select id="cat-prod-sort" onchange="sortCategoryProducts(this.value)" class="bg-zinc-900 border border-white/10 rounded-2xl px-4 py-3 text-sm text-zinc-400 focus:outline-none focus:border-amber-500 appearance-none hidden md:block">
+          <option value="default">แนะนำ</option>
+          <option value="price-asc">ราคา: ต่ำ-สูง</option>
+          <option value="price-desc">ราคา: สูง-ต่ำ</option>
+          <option value="stock-desc">ขายดี (สต็อก)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Category Horizontal Selector (Moszxllshop style) -->
+    <div class="flex items-center gap-3 overflow-x-auto pb-4 scrollbar-hide snap-x" id="category-selector-grid">
+      <!-- Rendered via JS -->
+    </div>
+    
+    <!-- Mobile Sort (Visible only on mobile) -->
+    <div class="md:hidden flex justify-end">
+        <select id="cat-prod-sort-mobile" onchange="sortCategoryProducts(this.value)" class="bg-zinc-900 border border-white/10 rounded-xl px-4 py-2 text-xs text-zinc-400 focus:outline-none focus:border-amber-500 appearance-none">
+          <option value="default">เรียงตาม: แนะนำ</option>
+          <option value="price-asc">ราคา: ต่ำ-สูง</option>
+          <option value="price-desc">ราคา: สูง-ต่ำ</option>
+          <option value="stock-desc">ขายดี (สต็อก)</option>
+        </select>
+    </div>
+
+    <!-- Products Grid -->
+    <div id="category-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- Rendered via JS -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="category-products-empty" class="hidden py-20 text-center flex-col items-center justify-center border border-dashed border-white/10 rounded-3xl bg-zinc-950">
+      <svg class="w-12 h-12 text-zinc-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+      <span class="text-base font-heading font-black text-white uppercase tracking-wider mb-1">ไม่พบสินค้า</span>
+      <span class="text-xs text-zinc-500">ยังไม่มีสินค้าในหมวดหมู่นี้ หรือลองเปลี่ยนคำค้นหา</span>
+    </div>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: PRODUCT DETAIL & MULTI-IMAGE GALLERY -->
+  <!-- ======================================================== -->
+  <div id="detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+    <div class="bg-zinc-950 border border-white/10 rounded-3xl max-w-4xl w-full p-6 sm:p-8 relative my-8 shadow-2xl">
+      <button onclick="closeProductModal()" class="absolute top-5 right-5 text-zinc-400 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors z-10">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <div class="grid md:grid-cols-12 gap-8 items-start">
+        <!-- Left: Image Gallery Showcase -->
+        <div class="md:col-span-6 space-y-4">
+          <div class="aspect-[4/3] w-full rounded-2xl overflow-hidden bg-zinc-900 border border-white/10 relative group">
+            <img id="modal-main-image" src="" alt="Product" class="w-full h-full object-cover transition-all duration-300">
+          </div>
+          <!-- Thumbnails Row -->
+          <div id="modal-thumbnails" class="flex gap-2.5 overflow-x-auto pb-2">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Right: Info & Checkout Action -->
+        <div class="md:col-span-6 flex flex-col justify-between h-full space-y-6">
+          <div>
+            <div class="flex items-center gap-2 mb-1.5">
+              <span id="modal-category-name" class="text-xs font-mono font-bold text-amber-500 uppercase tracking-widest bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
+                หมวดหมู่
+              </span>
+              <span id="modal-koen-tag" class="text-xs font-mono font-bold text-zinc-400 bg-zinc-900 px-2.5 py-0.5 rounded-full border border-white/10">
+                0 Koen
+              </span>
+            </div>
+
+            <h2 id="modal-title" class="text-2xl sm:text-3xl font-heading font-black text-white uppercase tracking-tight mb-3">
+              ชื่อสินค้า
+            </h2>
+            <p id="modal-desc" class="text-xs sm:text-sm text-zinc-400 leading-relaxed mb-6">
+              คำอธิบายสินค้า
+            </p>
+
+            <div class="bg-zinc-900/60 p-4 rounded-2xl border border-white/5 space-y-2 mb-6">
+              <span class="text-xs font-bold text-zinc-300 uppercase tracking-wider block font-heading">สิ่งที่จะได้รับภายในตัวไอดี:</span>
+              <ul id="modal-specs-list" class="space-y-1.5 text-xs text-zinc-400">
+                <!-- Rendered via JS -->
+              </ul>
+            </div>
+          </div>
+
+          <div class="pt-6 border-t border-white/10 flex items-center justify-between gap-4">
+            <div>
+              <span class="text-[10px] text-zinc-500 uppercase font-mono block">ราคาจำหน่ายพิเศษ</span>
+              <span id="modal-price" class="text-3xl font-heading font-black text-amber-400">฿0.00</span>
+            </div>
+            <button id="modal-buy-btn" onclick="triggerCheckoutFromModal()" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-8 py-3.5 rounded-2xl text-xs uppercase tracking-wider transition-all font-heading shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:scale-105 active:scale-95 flex items-center gap-2">
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <span>สั่งซื้อทันที</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: INSTANT CHECKOUT & DELIVERY -->
+  <!-- ======================================================== -->
+  <div id="checkout-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/90 backdrop-blur-xl overflow-y-auto">
+    <div class="bg-zinc-950 border border-white/10 rounded-3xl max-w-md w-full p-6 sm:p-8 relative my-8 shadow-2xl">
+      <button onclick="closeCheckoutModal()" class="absolute top-5 right-5 text-zinc-400 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <!-- CHECKOUT STATE 1: PAYMENT FORM -->
+      <div id="checkout-step-pay" class="space-y-6">
+        <div class="text-center">
+          <div class="inline-flex items-center gap-2 text-amber-500 text-xs font-mono font-bold uppercase tracking-widest mb-1 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+            PROMPT-PAY CHECKOUT
+          </div>
+          <h3 id="checkout-prod-name" class="text-xl font-heading font-black text-white uppercase tracking-tight">
+            ยืนยันการสั่งซื้อ
+          </h3>
+          <p class="text-zinc-500 text-xs mt-1">สแกนชำระเงินผ่านพร้อมเพย์ ระบบจัดส่งข้อมูลไอดีเกมอัตโนมัติ</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl w-48 h-48 mx-auto flex items-center justify-center shadow-xl">
+          <img id="checkout-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=TACTICAL_STORE_PAY" alt="QR Code" class="w-full h-full object-contain">
+        </div>
+
+        <div class="bg-zinc-900/80 p-4 rounded-2xl border border-white/5 space-y-2 text-xs">
+          <div class="flex justify-between text-zinc-400">
+            <span>ยอดชำระสุทธิ:</span>
+            <span id="checkout-total-price" class="text-amber-400 font-mono font-bold text-base">฿0.00</span>
+          </div>
+          <div class="flex justify-between text-zinc-400">
+            <span>ชื่อบัญชี:</span>
+            <span class="text-white font-semibold">TACTICAL STORE (THAILAND)</span>
+          </div>
+        </div>
+
+        <button onclick="handleCategoryOrderPayment()" id="btn-confirm-pay" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3.5 rounded-2xl transition-all shadow-lg text-xs font-heading uppercase tracking-wider active:scale-95 flex items-center justify-center gap-2">
+          <span>แจ้งโอนเงินเรียบร้อย (รับไอดีทันที)</span>
+        </button>
+      </div>
+
+      <!-- CHECKOUT STATE 2: ORDER SUCCESS -->
+      <div id="checkout-step-success" class="hidden space-y-6 text-center">
+        <div class="w-16 h-16 bg-emerald-500/20 border border-emerald-500/30 rounded-2xl flex items-center justify-center mx-auto text-emerald-400 text-2xl">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <div>
+          <h3 class="text-2xl font-heading font-black text-white uppercase tracking-tight mb-1">สั่งซื้อสำเร็จ!</h3>
+          <p class="text-zinc-400 text-xs">ส่งมอบไอดีจากตู้เซฟสต็อกเรียบร้อยแล้ว</p>
+        </div>
+        <div class="glass-card p-5 rounded-2xl border border-amber-500/30 text-left space-y-3 font-mono text-xs">
+          <div class="flex justify-between border-b border-white/5 pb-2">
+            <span class="text-zinc-500">เลขที่ออเดอร์:</span>
+            <span id="success-order-num" class="text-amber-400 font-bold">#ORD-XXXX</span>
+          </div>
+          <div class="flex justify-between items-center bg-zinc-900/90 p-2.5 rounded-xl border border-white/5">
+            <div>
+              <span class="text-zinc-500 text-[10px] block">USERNAME:</span>
+              <span id="success-user-text" class="text-white font-bold select-all">Agent</span>
+            </div>
+            <button onclick="navigator.clipboard.writeText(document.getElementById('success-user-text').innerText); triggerToast('คัดลอก Username สำเร็จ');" class="text-xs text-zinc-400 hover:text-amber-400">📋 คัดลอก</button>
+          </div>
+          <div class="flex justify-between items-center bg-zinc-900/90 p-2.5 rounded-xl border border-white/5">
+            <div>
+              <span class="text-zinc-500 text-[10px] block">PASSWORD:</span>
+              <span id="success-pass-text" class="text-amber-400 font-bold select-all">••••••••</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button id="cat-pw-toggle-btn" onclick="toggleCategoryPassword()" class="text-xs text-zinc-400 hover:text-white">👁️ แสดง</button>
+              <button onclick="navigator.clipboard.writeText(window.currentCategoryDeliveredPass || ''); triggerToast('คัดลอก Password สำเร็จ');" class="text-xs text-zinc-400 hover:text-amber-400">📋 คัดลอก</button>
+            </div>
+          </div>
+          <div class="text-[10px] text-zinc-400 bg-zinc-900/40 p-2 rounded-lg border border-white/5">
+            ⚠️ คำแนะนำ: กรุณาล็อกอินและเปลี่ยนรหัสผ่านในเกม Arena Breakout ทันทีหลังได้รับไอดี
+          </div>
+        </div>
+        <div class="space-y-2">
+          <a href="account.html" class="block w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3 rounded-xl transition-all text-xs font-heading uppercase shadow-md">
+            ไปยังหน้าประวัติคำสั่งซื้อ
+          </a>
+          <button onclick="closeCheckoutModal()" class="w-full bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-bold py-3 rounded-xl transition-all text-xs">
+            ปิดหน้าต่าง
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Quick Navigation Bar -->
+  <div class="md:hidden fixed bottom-0 left-0 right-0 bg-[#050505]/95 backdrop-blur-xl border-t border-white/10 z-40 pb-safe">
+    <div class="flex items-center justify-around py-3 px-2">
+      <a href="../index.html" class="flex flex-col items-center gap-1 text-[10px] font-bold text-zinc-500 hover:text-white">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <span>หน้าแรก</span>
+      </a>
+      <a href="category.html" class="flex flex-col items-center gap-1 text-[10px] font-bold text-amber-500">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <span>สินค้าทั้งหมด</span>
+      </a>
+      <a href="account.html" class="flex flex-col items-center gap-1 text-[10px] font-bold text-zinc-500 hover:text-white">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        <span>บัญชี</span>
+      </a>
+    </div>
+  </div>
+
+  <script type="module" src="../js/category.js"></script>
+</body>
+</html>

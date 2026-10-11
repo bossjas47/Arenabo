@@ -1,0 +1,147 @@
+/* ========================================================
+   TACTICAL STORE — Master Stylesheet
+   Arena Breakout Instant Market & Admin Suite
+   ======================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Prompt:wght@300;400;500;600;700&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* 1. Global Typography Enforcement across Entire Store & Admin */
+html, body {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden !important;
+  margin: 0;
+  padding: 0;
+  font-family: 'Prompt', sans-serif !important;
+  background-color: #050505;
+  color: #d4d4d8;
+  position: relative;
+}
+
+body, input, textarea, select, button, table, td, th {
+  font-family: 'Prompt', sans-serif !important;
+}
+
+/* 2. Tactical Headings & Numbers */
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: 'Outfit', 'Prompt', sans-serif !important;
+}
+
+/* 3. Monospace Identifiers (Order ID, Credentials, Badges) */
+.font-mono, code, pre {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+}
+
+/* 4. Tactical Vector Icons & Hover Transitions */
+svg {
+  shape-rendering: geometricPrecision;
+  vertical-align: middle;
+}
+
+/* 5. Marquee Continuous Scroll */
+@keyframes marqueeScroll {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee-track {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: marqueeScroll 28s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* 6. Custom Tactical Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #f59e0b;
+}
+
+/* 7. Tactical Glass Card Effects */
+.glass-card {
+  background: linear-gradient(180deg, rgba(18, 18, 22, 0.85) 0%, rgba(10, 10, 12, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.glass-card:hover {
+  border-color: rgba(245, 158, 11, 0.45);
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.12);
+}
+
+/* 8. Tactical Form & Input Glow */
+.tactical-input {
+  background-color: rgba(18, 18, 22, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.25s ease;
+  font-family: 'Prompt', sans-serif !important;
+}
+
+.tactical-input:focus {
+  border-color: #f59e0b;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+  outline: none;
+}
+
+/* 9. Chrome Autofill Background Fix */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff;
+  -webkit-box-shadow: 0 0 0px 1000px #0e0e12 inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* 10. Tactical HUD Grid Background */
+.tactical-grid-bg {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+/* 11. Image Gallery Thumbnails */
+.gallery-thumb {
+  transition: all 0.2s ease;
+  opacity: 0.6;
+}
+
+.gallery-thumb:hover {
+  opacity: 0.9;
+}
+
+.gallery-thumb.active {
+  opacity: 1;
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+}
+
+/* 12. Admin Table Zebra Striping & Hover */
+.admin-table tbody tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.015);
+}
+
+.admin-table tbody tr:hover {
+  background-color: rgba(245, 158, 11, 0.04);
+}
